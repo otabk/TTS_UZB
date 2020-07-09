@@ -15,6 +15,7 @@ namespace ConsoleApp1
 						_1000lik = new string[] { "юз", "минг", "миллион", "миллиард", "триллион" },
 						_kasr = new string[] { "ўндан", "юздан", "мингдан", "миллиондан", "миллиарддан", "триллиондан" };
 		private static bool _isKasr = false;
+		private static string _butun = "бутун";
 
 		static void Main(string[] args)
 		{
