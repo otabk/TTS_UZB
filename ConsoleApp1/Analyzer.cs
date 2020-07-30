@@ -595,7 +595,21 @@ namespace ConsoleApp1
 
 		public string IsAero(string word)
 		{
-			return "";
+			word = word.ToLower();
+			string result = "";
+			if (word.Contains("аэро"))
+			{
+				int index = word.IndexOf("аэро");
+				if (index == 0)
+				{
+					result = "а-э-ро";
+				}
+				else
+				{
+					result = "а-э-ро-";
+				}
+			}
+			return result;
 		}
 
 		int main()
@@ -742,7 +756,7 @@ namespace ConsoleApp1
 									{
 
 										// "Аэро" сузини ажратиб олиш ---------------------------------------------------------------------------------------------
-										if ((wordlen - pos > 3 && unliall - unli > 2) & ((int)sword[pos] == 'А' || (int)sword[pos] == 'а'))
+										if ((wordlen - pos > 3 && unliall - unli > 2) && (sword[pos] == 'А' || sword[pos] == 'а'))
 										{
 											if ((sword[pos + 0] == 'А' & sword[pos + 1] == 'Э' && sword[pos + 2] == 'Р' && sword[pos + 3] == 'О') ||
 													(sword[pos + 0] == 'А' && sword[pos + 1] == 'э' && sword[pos + 2] == 'р' && sword[pos + 3] == 'о') ||
