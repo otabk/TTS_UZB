@@ -19,18 +19,18 @@ namespace ConsoleApp1
 			_word = w;
 		}
 
-		public void Analyze(string word)
+		public string Analyze(string word)
 		{
 			if (!string.IsNullOrEmpty(word))
 			{
+				int Symbol = word.Length;  // Катордаги белгилар сони
 				// Катор ва сузларни укиш параметрлари
-				int[] posStr = new int[30];
+				int[] wordMap = new int[Symbol];
 				string fullword = "";
 				string sword = word;
 				string acword = "";
 				int totalword = 0;
 				// Каторни ва сузни тахлил килиш параметрлари (боши)------------------------
-				int Symbol = word.Length;  // Катордаги белгилар сони
 				int wordlen = 0;
 				int unliall = 0;            // Унли харфлар сони
 				int pos = 0;                // Бугинни жойини аниклаш
@@ -46,501 +46,257 @@ namespace ConsoleApp1
 							word[i] == 'А' || //А
 							word[i] == 'о' || //о
 							word[i] == 'О' || //О
-							word[i] == 1080 || //и
-							word[i] == 1048 || //И
+							word[i] == 'И' || //и
+							word[i] == 'и' || //И
 							word[i] == 'э' || //э
 							word[i] == 'Э' || //Э
-							word[i] == 1091 || //у
-							word[i] == 1059 || //У
-							word[i] == 1118 || //ў
-							word[i] == 1038 || //Ў
-							word[i] == 1077 || //е
-							word[i] == 1045 || //Е
-							word[i] == 1105 || //ё
-							word[i] == 1025 || //Ё
-							word[i] == 1102 || //ю
-							word[i] == 1070 || //Ю
-							word[i] == 1103 || //я
-							word[i] == 1071)  //Я
+							word[i] == 'у' || //у
+							word[i] == 'У' || //У
+							word[i] == 'ў' || //ў
+							word[i] == 'Ў' || //Ў
+							word[i] == 'е' || //е
+							word[i] == 'Е' || //Е
+							word[i] == 'ё' || //ё
+							word[i] == 'Ё' || //Ё
+							word[i] == 'ю' || //ю
+							word[i] == 'Ю' || //Ю
+							word[i] == 'я' || //я
+							word[i] == 'Я')  //Я
 					{
-						posStr[i] = 0;
+						wordMap[i] = 0;
 						unliall++;
 					}
 					else
 					{
-						if (word[i] == 1066 || word[i] == 1098) //Ъ ва ъ белгиларини аниклаш
+						if (word[i] == 'Ъ' || word[i] == 'ъ') //Ъ ва ъ белгиларини аниклаш
 						{
-							posStr[i] = 2;
+							wordMap[i] = 2;
 						}
 						else
 						{
-							if (word[i] == 1068 || word[i] == 1100) //Ь ва ь белгиларини аниклаш
-								posStr[i] = 3;
+							if (word[i] == 'Ь' || word[i] == 'ь') //Ь ва ь белгиларини аниклаш
+								wordMap[i] = 3;
 							else
-								posStr[i] = 1;
+								wordMap[i] = 1;
 						}
 					}
 					// агар суз бир бугиндан иборат булса
 					if (unliall == 1)
 					{
-						using (StreamWriter sw = new StreamWriter(OutFile, false, Encoding.UTF8))
-						{
-							sw.WriteLine(sword);
-						}
+						return word;
 					}
-
 					// Суз икки ва ундан куп бугиндан иборат булса (боши) --------------------------------------------------------------------------------
 					else
 					{
-						for (int l = 0; l < unliall - 1; l++)
+						var r = IsAero(word);
+						if (!string.IsNullOrEmpty(r))
+							return r;
+						r = IsAvia(word);
+						if (!string.IsNullOrEmpty(r))
+							return r;
+						r = IsAvto(word);
+						if (!string.IsNullOrEmpty(r))
+							return r;
+						r = IsFoto(word);
+						if (!string.IsNullOrEmpty(r))
+							return r;
+						r = IsFoton(word);
+						if (!string.IsNullOrEmpty(r))
+							return r;
+						r = IsTele(word);
+						if (!string.IsNullOrEmpty(r))
+							return r;						
+
+						// охири "ё" билан тугаган сузлар билан ишлаш
+						if ((unliall - unli == 2) & ((int)sword[wordlen - 1] == 'Ё' || (int)sword[wordlen - 1] == 'ё')) // 2 та унли ва охири "ё" булса
 						{
-
-							// "Аэро" сузини ажратиб олиш ---------------------------------------------------------------------------------------------
-							if ((wordlen - pos > 3 && unliall - unli > 2) && ((int)sword[pos] == 'А' || (int)sword[pos] == 'а'))
+							for (int j = pos; j < wordlen - 1; j++) fullword = fullword + sword[j];
+							fullword = fullword + "-" + sword[wordlen - 1];
+							using (StreamWriter sw = new StreamWriter(OutFile, false, Encoding.UTF8))
 							{
-								if ((sword[pos + 0] == 'А' & sword[pos + 1] == 'Э' && sword[pos + 2] == 'Р' && sword[pos + 3] == 'О') ||
-										(sword[pos + 0] == 'А' && sword[pos + 1] == 'э' && sword[pos + 2] == 'р' && sword[pos + 3] == 'о') ||
-										(sword[pos + 0] == 'а' && sword[pos + 1] == 'э' && sword[pos + 2] == 'р' && sword[pos + 3] == 'о'))
-								{
-									if (wordlen == 4)
-										fullword = fullword + sword[pos + 0] + "-" + sword[pos + 1] + "-" + sword[pos + 2] + sword[pos + 3];
-									else
-										fullword = fullword + sword[pos + 0] + "-" + sword[pos + 1] + "-" + sword[pos + 2] + sword[pos + 3] + "-";
-									pos += 4;
-									unli += 3;
-									l += 3;
-									if (wordlen - pos == 0)
-									{
-										using (StreamWriter sw = new StreamWriter(OutFile, false, Encoding.UTF8))
-										{
-											sw.WriteLine(fullword);
-										}
-										return;
-									}
-									if (unliall - unli == 1) goto lastsyl;
-									//i++;
-								}
+								sw.WriteLine(fullword);
 							}
-							/*
-									// "Авиа" сузини ажратиб олиш ---------------------------------------------------------------------------------------------
-										if ((wordlen-pos > 3 & unliall-unli > 2) & ((int)sword[pos] == 'А' || (int)sword[pos] == 'а'))
-										{
-										if (((int)sword[pos+0] == 'А' & (int)sword[pos+1] == 'Э' & (int)sword[pos+2] == 'Р' & (int)sword[pos+3] == 'О' ) ||
-											((int)sword[pos+0] == 'А' & (int)sword[pos+1] == 'э' & (int)sword[pos+2] == 'р' & (int)sword[pos+3] == 'о' ) ||
-											((int)sword[pos+0] == 'а' & (int)sword[pos+1] == 'э' & (int)sword[pos+2] == 'р' & (int)sword[pos+3] == 'о' ))
-											{
-												if (wordlen == 4)
-													fullword = fullword + sword[pos+0] + "-" + sword[pos+1] + "-" + sword[pos+2] + sword[pos+3];
-												else
-													fullword = fullword + sword[pos+0] + "-" + sword[pos+1] + "-" + sword[pos+2] + sword[pos+3] + "-";
-												pos = pos+4;
-												unli = unli + 3;
-												i = i + 3;
-												if (wordlen-pos == 0)
-												{
-													fileout << fullword << endl;
-													goto endword;
-												}
-												if (unliall-unli == 1) goto lastsyl;
-												//i++;
-											}
-										}
-							*/
+							//fileout << fullword << endl;
+							goto wordfin;
+						}
 
-							// "Фото" ва "Фотон" сузларини ажратиб олиш-----------------------------------------------------------------------------------------------
-							if ((wordlen - pos > 3 & unliall - unli > 1) & ((int)sword[pos] == 1060 || (int)sword[pos] == 1092))
+						// Агар суз унли харфдан бошланса------------------------------------------------------------------------------------
+						if (wordMap[pos] == 0)
+						{
+							if (wordlen - pos > 4) // агар суз узунлиги 4 харфдан катта булса
 							{
-								if (((int)sword[pos + 0] == 1060 & (int)sword[pos + 1] == 'О' & (int)sword[pos + 2] == 1058 & (int)sword[pos + 3] == 'О') ||
-										((int)sword[pos + 0] == 1060 & (int)sword[pos + 1] == 'о' & (int)sword[pos + 2] == 1090 & (int)sword[pos + 3] == 'о') ||
-										((int)sword[pos + 0] == 1092 & (int)sword[pos + 1] == 'о' & (int)sword[pos + 2] == 1090 & (int)sword[pos + 3] == 'о'))
+								// 0111+0 холатни аниклаш
+								if (wordMap[pos + 0] == 0 & wordMap[pos + 1] == 1 & wordMap[pos + 2] == 1 & wordMap[pos + 3] == 1 & wordMap[pos + 4] == 0) //гссс+г
 								{
-									if (wordlen == 4)
-									{
-										fullword = fullword + sword[pos + 0] + sword[pos + 1] + "-" + sword[pos + 2] + sword[pos + 3];
-										pos = pos + 4;
-									}
-									else
-									{
-										if (wordlen == 5)
-										{
-											fullword = fullword + sword[pos + 0] + sword[pos + 1] + "-" + sword[pos + 2] + sword[pos + 3] + sword[pos + 4];
-											pos = pos + 5;
-										}
-										else
-										{
-											if (((int)sword[pos + 4] == 1053 || (int)sword[pos + 4] == 1085) & posStr[pos + 5] == 1)
-											{
-												fullword = fullword + sword[pos + 0] + sword[pos + 1] + "-" + sword[pos + 2] + sword[pos + 3] + sword[pos + 4] + "-";
-												pos = pos + 5;
-											}
-											else
-											{
-												fullword = fullword + sword[pos + 0] + sword[pos + 1] + "-" + sword[pos + 2] + sword[pos + 3] + "-";
-												pos = pos + 4;
-											}
-										}
-									}
-
-									unli = unli + 2;
-									l = l + 2;
-
-									if (wordlen - pos == 0)
-									{
-										using (StreamWriter sw = new StreamWriter(OutFile, false, Encoding.UTF8))
-										{
-											sw.WriteLine(fullword);
-										}
-										return 0;
-										//fileout << fullword << endl;
-										//goto endword;
-									}
-									if (unliall - unli == 1) goto lastsyl;
+									fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + "-"; //011 ни олиш (авжланмок, антракт)
+									pos = pos + 3;
+									unli++;
+									goto endunli;
 								}
 							}
 
-							// "Теле" сузини ажратиб олиш ---------------------------------------------------------------------------------------------
-							if ((wordlen - pos > 3 & unliall - unli > 1) & ((int)sword[pos] == 1058 || (int)sword[pos] == 1090))
+							if (wordlen - pos > 3) // агар суз узунлиги 3 харфдан катта булса
 							{
-								if (((int)sword[pos + 0] == 1058 || (int)sword[pos + 0] == 1090) & // Т ёки т
-										((int)sword[pos + 1] == 1045 || (int)sword[pos + 1] == 1077) & // Е ёки е
-										((int)sword[pos + 2] == 1051 || (int)sword[pos + 2] == 1083) & // Л ёки л
-										((int)sword[pos + 3] == 1045 || (int)sword[pos + 3] == 1077)) // Е ёки е
+								// 011+1 холатни аниклаш
+								if (wordMap[pos + 0] == 0 & wordMap[pos + 1] == 1 & wordMap[pos + 2] == 1 & wordMap[pos + 3] == 1) //гсс+с
 								{
-									if (wordlen == 4)
-										fullword = fullword + sword[pos + 0] + sword[pos + 1] + "-" + sword[pos + 2] + sword[pos + 3];
-									else
-										fullword = fullword + sword[pos + 0] + sword[pos + 1] + "-" + sword[pos + 2] + sword[pos + 3] + "-";
-									pos = pos + 4;
-									unli = unli + 2;
-									l = l + 2; // бугинлар сони
-									if (wordlen - pos == 0)
-									{
-										using (StreamWriter sw = new StreamWriter(OutFile, false, Encoding.UTF8))
-										{
-											sw.WriteLine(fullword);
-										}
-										return 0;
-										//fileout << fullword << endl;
-										//goto endword;
-									}
-									if (unliall - unli == 1) goto lastsyl;
-									//i++;
+									fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + "-"; //011 ни олиш
+									pos = pos + 3;
+									unli++;
+									goto endunli;
+								}
+								// 011+0 холатни аниклаш
+								if (wordMap[pos + 0] == 0 & wordMap[pos + 1] == 1 & wordMap[pos + 2] == 1 & wordMap[pos + 3] == 0) //гсс+г
+								{
+									fullword = fullword + sword[pos + 0] + sword[pos + 1] + "-"; //01 ни олиш
+									pos = pos + 2;
+									unli++;
+									goto endunli;
+								}
+								// 02 холатни аниклаш
+								if (wordMap[pos + 0] == 0 & wordMap[pos + 1] == 2) //г+ъ
+								{
+									fullword = fullword + sword[pos + 0] + sword[pos + 1] + "-"; //02 ни олиш
+									pos = pos + 2;
+									unli++;
+									goto endunli;
+								}
+								// 012 холатни аниклаш
+								if (wordMap[pos + 0] == 0 & wordMap[pos + 1] == 1 & wordMap[pos + 2] == 2) //гс+ъ
+								{
+									fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + "-"; //012 ни олиш
+									pos = pos + 3;
+									unli++;
+									goto endunli;
 								}
 							}
-
-
-							// "Авто" ва "Автор" сузларини ажратиб олиш-----------------------------------------------------------------------------------------------
-							if ((wordlen - pos > 3 & unliall - unli > 1) & ((int)sword[pos] == 'А' || (int)sword[pos] == 'а'))
+							// агар суз узунлиги 3 харф ва ундан кичик булса
 							{
-								if (((int)sword[pos + 0] == 'А' || (int)sword[pos + 0] == 'а') & // А ёки а
-										((int)sword[pos + 1] == 1042 || (int)sword[pos + 1] == 1074) & // В ёки в
-										((int)sword[pos + 2] == 1058 || (int)sword[pos + 2] == 1090) & // Т ёки т
-										((int)sword[pos + 3] == 'О' || (int)sword[pos + 3] == 'о')) // О ёки о
+								// 013 холатни аниклаш (альфа, ультра) юмшатиш белгили сузлар
+								if (wordMap[pos + 0] == 0 & wordMap[pos + 1] == 1 & wordMap[pos + 2] == 3) // гсь
 								{
-									if (wordlen == 4)
-									{
-										fullword = fullword + sword[pos + 0] + sword[pos + 1] + "-" + sword[pos + 2] + sword[pos + 3];
-										pos = pos + 4;
-									}
-									else
-									{
-										if (wordlen == 5)
-										{
-											fullword = fullword + sword[pos + 0] + sword[pos + 1] + "-" + sword[pos + 2] + sword[pos + 3] + sword[pos + 4];
-											pos = pos + 5;
-										}
-										else
-										{
-											if ((((int)sword[pos + 4] == 'Р' || (int)sword[pos + 4] == 'р') ||                    // Р ёки р (авто-р)
-													((int)sword[pos + 4] == 1051 || (int)sword[pos + 4] == 1083)) & posStr[pos + 5] == 1) // Л ёки л (авто-л)
-											{
-												fullword = fullword + sword[pos + 0] + sword[pos + 1] + "-" + sword[pos + 2] + sword[pos + 3] + sword[pos + 4] + "-";
-												pos = pos + 5;
-											}
-											else
-											{
-												fullword = fullword + sword[pos + 0] + sword[pos + 1] + "-" + sword[pos + 2] + sword[pos + 3] + "-";
-												pos = pos + 4;
-											}
-										}
-									}
-
-									unli = unli + 2;
-									l = l + 2;
-
-									if (wordlen - pos == 0)
-									{
-										using (StreamWriter sw = new StreamWriter(OutFile, false, Encoding.UTF8))
-										{
-											sw.WriteLine(fullword);
-										}
-										//fileout << fullword << endl;
-										//goto endword;
-									}
-									if (unliall - unli == 1) goto lastsyl;
-								}
-							}
-
-							// охири "ё" билан тугаган сузлар билан ишлаш
-							if ((unliall - unli == 2) & ((int)sword[wordlen - 1] == 1025 || (int)sword[wordlen - 1] == 1105)) // 2 та унли ва охири "ё" булса
-							{
-								for (int j = pos; j < wordlen - 1; j++) fullword = fullword + sword[j];
-								fullword = fullword + "-" + sword[wordlen - 1];
-								using (StreamWriter sw = new StreamWriter(OutFile, false, Encoding.UTF8))
-								{
-									sw.WriteLine(fullword);
-								}
-								//fileout << fullword << endl;
-								goto wordfin;
-							}
-
-							// Агар суз унли харфдан бошланса------------------------------------------------------------------------------------
-							if (posStr[pos] == 0)
-							{
-								if (wordlen - pos > 4) // агар суз узунлиги 4 харфдан катта булса
-								{
-									// 0111+0 холатни аниклаш
-									if (posStr[pos + 0] == 0 & posStr[pos + 1] == 1 & posStr[pos + 2] == 1 & posStr[pos + 3] == 1 & posStr[pos + 4] == 0) //гссс+г
-									{
-										fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + "-"; //011 ни олиш (авжланмок, антракт)
-										pos = pos + 3;
-										unli++;
-										goto endunli;
-									}
+									fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + "-"; //013 ни олиш
+									pos = pos + 3;
+									unli++;
+									goto endunli;
 								}
 
-								if (wordlen - pos > 3) // агар суз узунлиги 3 харфдан катта булса
+								// 01+0 холатни аниклаш
+								if (wordMap[pos + 0] == 0 & wordMap[pos + 1] == 1 & wordMap[pos + 2] == 0) //сг+с
 								{
-									// 011+1 холатни аниклаш
-									if (posStr[pos + 0] == 0 & posStr[pos + 1] == 1 & posStr[pos + 2] == 1 & posStr[pos + 3] == 1) //гсс+с
+									if ((sword[pos + 1] == 1049 || sword[pos + 1] == 1081) & (sword[pos + 2] == 1025 || sword[pos + 2] == 1105)) // агар унлидан кейин "йё" булса
 									{
-										fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + "-"; //011 ни олиш
-										pos = pos + 3;
-										unli++;
-										goto endunli;
-									}
-									// 011+0 холатни аниклаш
-									if (posStr[pos + 0] == 0 & posStr[pos + 1] == 1 & posStr[pos + 2] == 1 & posStr[pos + 3] == 0) //гсс+г
-									{
-										fullword = fullword + sword[pos + 0] + sword[pos + 1] + "-"; //01 ни олиш
+										fullword = fullword + sword[pos + 0] + sword[pos + 1] + "-"; //01 ни олиш (унли+й ни олиш) - ай-ёр, ай-ём
 										pos = pos + 2;
 										unli++;
 										goto endunli;
 									}
-									// 02 холатни аниклаш
-									if (posStr[pos + 0] == 0 & posStr[pos + 1] == 2) //г+ъ
+									else
 									{
-										fullword = fullword + sword[pos + 0] + sword[pos + 1] + "-"; //02 ни олиш
-										pos = pos + 2;
-										unli++;
-										goto endunli;
-									}
-									// 012 холатни аниклаш
-									if (posStr[pos + 0] == 0 & posStr[pos + 1] == 1 & posStr[pos + 2] == 2) //гс+ъ
-									{
-										fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + "-"; //012 ни олиш
-										pos = pos + 3;
-										unli++;
-										goto endunli;
-									}
-								}
-								// агар суз узунлиги 3 харф ва ундан кичик булса
-								{
-									// 013 холатни аниклаш (альфа, ультра) юмшатиш белгили сузлар
-									if (posStr[pos + 0] == 0 & posStr[pos + 1] == 1 & posStr[pos + 2] == 3) // гсь
-									{
-										fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + "-"; //013 ни олиш
-										pos = pos + 3;
-										unli++;
-										goto endunli;
-									}
-
-									// 01+0 холатни аниклаш
-									if (posStr[pos + 0] == 0 & posStr[pos + 1] == 1 & posStr[pos + 2] == 0) //сг+с
-									{
-										if ((sword[pos + 1] == 1049 || sword[pos + 1] == 1081) & (sword[pos + 2] == 1025 || sword[pos + 2] == 1105)) // агар унлидан кейин "йё" булса
-										{
-											fullword = fullword + sword[pos + 0] + sword[pos + 1] + "-"; //01 ни олиш (унли+й ни олиш) - ай-ёр, ай-ём
-											pos = pos + 2;
-											unli++;
-											goto endunli;
-										}
-										else
-										{
-											fullword = fullword + sword[pos + 0] + "-"; //0 ни олиш (акс холда факат унлини олиш)
-											pos = pos + 1;
-											unli++;
-											goto endunli;
-										}
-									}
-									// 0+0 холатни аниклаш
-									if (posStr[pos + 0] == 0 & posStr[pos + 1] == 0) //г+г
-									{
-										fullword = fullword + sword[pos + 0] + "-"; //0 ни олиш
+										fullword = fullword + sword[pos + 0] + "-"; //0 ни олиш (акс холда факат унлини олиш)
 										pos = pos + 1;
 										unli++;
 										goto endunli;
 									}
 								}
-							endunli:;
+								// 0+0 холатни аниклаш
+								if (wordMap[pos + 0] == 0 & wordMap[pos + 1] == 0) //г+г
+								{
+									fullword = fullword + sword[pos + 0] + "-"; //0 ни олиш
+									pos = pos + 1;
+									unli++;
+									goto endunli;
+								}
+							}
+						endunli:;
+						}
+
+						// Агар суз ундош харфдан бошланса
+						else
+						{
+							if (wordlen - pos > 5) // агар суз узунлиги 5 харфдан катта булса
+							{
+								// 'э'1+1 холатни аниклаш
+								if (wordMap[pos + 0] == 1 & wordMap[pos + 1] == 1 & wordMap[pos + 2] == 0 & wordMap[pos + 3] == 1 & wordMap[pos + 4] == 1 & wordMap[pos + 5] == 1) //ссгсс+с
+								{
+									fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + sword[pos + 3] + sword[pos + 4] + "-"; //'э'1 ни олиш
+									pos = pos + 5;
+									unli++;
+									goto endundosh;
+								}
+								// 'э'1+0 холатни аниклаш
+								if (wordMap[pos + 0] == 1 & wordMap[pos + 1] == 1 & wordMap[pos + 2] == 0 & wordMap[pos + 3] == 1 & wordMap[pos + 4] == 1 & wordMap[pos + 5] == 0) //ссгсс+с
+								{
+									fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + sword[pos + 3] + "-"; //'э' ни олиш
+									pos = pos + 4;
+									unli++;
+									goto endundosh;
+								}
+								// 101311+1 холатни аниклаш (фильтрлаш, фильтрнинг), юмшатиш белгили сузлар
+								if (wordMap[pos + 0] == 1 & wordMap[pos + 1] == 0 & wordMap[pos + 2] == 1 & wordMap[pos + 3] == 3 & wordMap[pos + 4] == 1 & wordMap[pos + 5] == 1 & wordMap[pos + 6] == 1) //сгсьсс+с
+								{
+									fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + sword[pos + 3] + sword[pos + 4] + sword[pos + 5] + "-"; //101311 ни олиш
+									pos = pos + 6;
+									unli++;
+									goto endundosh;
+								}
+
+								// 10131+1 холатни аниклаш (мультфильм, фильмнинг), юмшатиш белгили сузлар
+								if (wordMap[pos + 0] == 1 & wordMap[pos + 1] == 0 & wordMap[pos + 2] == 1 & wordMap[pos + 3] == 3 & wordMap[pos + 4] == 1 & wordMap[pos + 5] == 1) //сгсьс+с
+								{
+									fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + sword[pos + 3] + sword[pos + 4] + "-"; //10131 ни олиш
+									pos = pos + 5;
+									unli++;
+									goto endundosh;
+								}
+
+								// 10111+0 холатни аниклаш
+								if (wordMap[pos + 0] == 1 & wordMap[pos + 1] == 0 & wordMap[pos + 2] == 1 & wordMap[pos + 3] == 1 & wordMap[pos + 4] == 1 & wordMap[pos + 5] == 0) //сгссс+г
+								{
+									fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + "-"; //101 ни олиш (кон-тракт)
+									pos = pos + 3;
+									unli++;
+									goto endundosh;
+								}
 							}
 
-							// Агар суз ундош харфдан бошланса
-							else
+							if (wordlen - pos > 4) // агар суз узунлиги 4 харфдан катта булса
 							{
-								if (wordlen - pos > 5) // агар суз узунлиги 5 харфдан катта булса
+								// 'э'+1 холатни аниклаш
+								if (wordMap[pos + 0] == 1 & wordMap[pos + 1] == 1 & wordMap[pos + 2] == 0 & wordMap[pos + 3] == 1 & wordMap[pos + 4] == 1) //ссгс+с
 								{
-									// 'э'1+1 холатни аниклаш
-									if (posStr[pos + 0] == 1 & posStr[pos + 1] == 1 & posStr[pos + 2] == 0 & posStr[pos + 3] == 1 & posStr[pos + 4] == 1 & posStr[pos + 5] == 1) //ссгсс+с
-									{
-										fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + sword[pos + 3] + sword[pos + 4] + "-"; //'э'1 ни олиш
-										pos = pos + 5;
-										unli++;
-										goto endundosh;
-									}
-									// 'э'1+0 холатни аниклаш
-									if (posStr[pos + 0] == 1 & posStr[pos + 1] == 1 & posStr[pos + 2] == 0 & posStr[pos + 3] == 1 & posStr[pos + 4] == 1 & posStr[pos + 5] == 0) //ссгсс+с
-									{
-										fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + sword[pos + 3] + "-"; //'э' ни олиш
-										pos = pos + 4;
-										unli++;
-										goto endundosh;
-									}
-									// 101311+1 холатни аниклаш (фильтрлаш, фильтрнинг), юмшатиш белгили сузлар
-									if (posStr[pos + 0] == 1 & posStr[pos + 1] == 0 & posStr[pos + 2] == 1 & posStr[pos + 3] == 3 & posStr[pos + 4] == 1 & posStr[pos + 5] == 1 & posStr[pos + 6] == 1) //сгсьсс+с
-									{
-										fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + sword[pos + 3] + sword[pos + 4] + sword[pos + 5] + "-"; //101311 ни олиш
-										pos = pos + 6;
-										unli++;
-										goto endundosh;
-									}
-
-									// 10131+1 холатни аниклаш (мультфильм, фильмнинг), юмшатиш белгили сузлар
-									if (posStr[pos + 0] == 1 & posStr[pos + 1] == 0 & posStr[pos + 2] == 1 & posStr[pos + 3] == 3 & posStr[pos + 4] == 1 & posStr[pos + 5] == 1) //сгсьс+с
-									{
-										fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + sword[pos + 3] + sword[pos + 4] + "-"; //10131 ни олиш
-										pos = pos + 5;
-										unli++;
-										goto endundosh;
-									}
-
-									// 10111+0 холатни аниклаш
-									if (posStr[pos + 0] == 1 & posStr[pos + 1] == 0 & posStr[pos + 2] == 1 & posStr[pos + 3] == 1 & posStr[pos + 4] == 1 & posStr[pos + 5] == 0) //сгссс+г
-									{
-										fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + "-"; //101 ни олиш (кон-тракт)
-										pos = pos + 3;
-										unli++;
-										goto endundosh;
-									}
+									fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + sword[pos + 3] + "-"; //'э' ни олиш
+									pos = pos + 4;
+									unli++;
+									goto endundosh;
 								}
-
-								if (wordlen - pos > 4) // агар суз узунлиги 4 харфдан катта булса
-								{
-									// 'э'+1 холатни аниклаш
-									if (posStr[pos + 0] == 1 & posStr[pos + 1] == 1 & posStr[pos + 2] == 0 & posStr[pos + 3] == 1 & posStr[pos + 4] == 1) //ссгс+с
-									{
-										fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + sword[pos + 3] + "-"; //'э' ни олиш
-										pos = pos + 4;
-										unli++;
-										goto endundosh;
-									}
-									// 'э'+0 холатни аниклаш
-									if (posStr[pos + 0] == 1 & posStr[pos + 1] == 1 & posStr[pos + 2] == 0 & posStr[pos + 3] == 1 & posStr[pos + 4] == 0) //ссгс+г
-									{
-										fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + "-"; //110 ни олиш
-										pos = pos + 3;
-										unli++;
-										goto endundosh;
-									}
-									// 'э'+3 холатни аниклаш (статья)
-									if (posStr[pos + 0] == 1 & posStr[pos + 1] == 1 & posStr[pos + 2] == 0 & posStr[pos + 3] == 1 & posStr[pos + 4] == 3) //ссгс+ь
-									{
-										fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + sword[pos + 3] + sword[pos + 4] + "-"; //'э'3 ни олиш
-										pos = pos + 5;
-										unli++;
-										goto endundosh;
-									}
-
-									// 1011+1 холатни аниклаш
-									if (posStr[pos + 0] == 1 & posStr[pos + 1] == 0 & posStr[pos + 2] == 1 & posStr[pos + 3] == 1 & posStr[pos + 4] == 1) //сгсс+с
-									{
-										fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + sword[pos + 3] + "-"; //1011 ни олиш
-										pos = pos + 4;
-										unli++;
-										goto endundosh;
-									}
-									// 1011+0 холатни аниклаш
-									if (posStr[pos + 0] == 1 & posStr[pos + 1] == 0 & posStr[pos + 2] == 1 & posStr[pos + 3] == 1 & posStr[pos + 4] == 0) //сгсс+г
-									{
-										fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + "-"; //101 ни олиш
-										pos = pos + 3;
-										unli++;
-										goto endundosh;
-									}
-
-									// 1011+3 холатни аниклаш (компьютер), юмшатиш белгили сузлар
-									if (posStr[pos + 0] == 1 & posStr[pos + 1] == 0 & posStr[pos + 2] == 1 & posStr[pos + 3] == 1 & posStr[pos + 4] == 3) //сгсс+ь
-									{
-										fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + sword[pos + 3] + sword[pos + 4] + "-"; //1011+3 ни олиш
-										pos = pos + 5;
-										unli++;
-										goto endundosh;
-									}
-									// 1013 холатни аниклаш (мульти, бальзам), юмшатиш белгили сузлар
-									if (posStr[pos + 0] == 1 & posStr[pos + 1] == 0 & posStr[pos + 2] == 1 & posStr[pos + 3] == 3) //сгсь
-									{
-										fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + sword[pos + 3] + "-"; //1013 ни олиш
-										pos = pos + 4;
-										unli++;
-										goto endundosh;
-									}
-
-									// Айриш белгиси катнашган сузларда бугин кучириш
-									// 1201 холатни аниклаш (съём-ка)
-									if (posStr[pos + 0] == 1 & posStr[pos + 1] == 2 & posStr[pos + 2] == 0 & posStr[pos + 3] == 1) //съгс
-									{
-										fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + sword[pos + 3] + "-"; //1201 ни олиш
-										pos = pos + 4;
-										unli++;
-										goto endundosh;
-									}
-									// 1012 холатни аниклаш
-									if (posStr[pos + 0] == 1 & posStr[pos + 1] == 0 & posStr[pos + 2] == 1 & posStr[pos + 3] == 2) //сгсъ
-									{
-										fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + sword[pos + 3] + "-"; //1012 ни олиш
-										pos = pos + 4;
-										unli++;
-										goto endundosh;
-									}
-									// 1021+1 холатни аниклаш
-									if (posStr[pos + 0] == 1 & posStr[pos + 1] == 0 & posStr[pos + 2] == 2 & posStr[pos + 3] == 1 & posStr[pos + 4] == 1) //сгъс+с
-									{
-										fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + sword[pos + 3] + "-"; //1021 ни олиш
-										pos = pos + 4;
-										unli++;
-										goto endundosh;
-									}
-									// 1021+0 холатни аниклаш
-									if (posStr[pos + 0] == 1 & posStr[pos + 1] == 0 & posStr[pos + 2] == 2 & posStr[pos + 3] == 1 & posStr[pos + 4] == 0) //сгъс+г
-									{
-										fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + "-"; //102 ни олиш
-										pos = pos + 3;
-										unli++;
-										goto endundosh;
-									}
-								}
-
-								// 110 холатни аниклаш
-								if (posStr[pos + 0] == 1 & posStr[pos + 1] == 1 & posStr[pos + 2] == 0) //ссг кейинги товушни текшириш шарт эмас
+								// 'э'+0 холатни аниклаш
+								if (wordMap[pos + 0] == 1 & wordMap[pos + 1] == 1 & wordMap[pos + 2] == 0 & wordMap[pos + 3] == 1 & wordMap[pos + 4] == 0) //ссгс+г
 								{
 									fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + "-"; //110 ни олиш
 									pos = pos + 3;
 									unli++;
 									goto endundosh;
 								}
+								// 'э'+3 холатни аниклаш (статья)
+								if (wordMap[pos + 0] == 1 & wordMap[pos + 1] == 1 & wordMap[pos + 2] == 0 & wordMap[pos + 3] == 1 & wordMap[pos + 4] == 3) //ссгс+ь
+								{
+									fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + sword[pos + 3] + sword[pos + 4] + "-"; //'э'3 ни олиш
+									pos = pos + 5;
+									unli++;
+									goto endundosh;
+								}
 
-								// 101+1 холатни аниклаш
-								if (posStr[pos + 0] == 1 & posStr[pos + 1] == 0 & posStr[pos + 2] == 1 & posStr[pos + 3] == 1) //сгс+с
+								// 1011+1 холатни аниклаш
+								if (wordMap[pos + 0] == 1 & wordMap[pos + 1] == 0 & wordMap[pos + 2] == 1 & wordMap[pos + 3] == 1 & wordMap[pos + 4] == 1) //сгсс+с
+								{
+									fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + sword[pos + 3] + "-"; //1011 ни олиш
+									pos = pos + 4;
+									unli++;
+									goto endundosh;
+								}
+								// 1011+0 холатни аниклаш
+								if (wordMap[pos + 0] == 1 & wordMap[pos + 1] == 0 & wordMap[pos + 2] == 1 & wordMap[pos + 3] == 1 & wordMap[pos + 4] == 0) //сгсс+г
 								{
 									fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + "-"; //101 ни олиш
 									pos = pos + 3;
@@ -548,45 +304,115 @@ namespace ConsoleApp1
 									goto endundosh;
 								}
 
-								// 101+0 холатни аниклаш
-								if (posStr[pos + 0] == 1 & posStr[pos + 1] == 0 & posStr[pos + 2] == 1 & posStr[pos + 3] == 0) //сгс+с
+								// 1011+3 холатни аниклаш (компьютер), юмшатиш белгили сузлар
+								if (wordMap[pos + 0] == 1 & wordMap[pos + 1] == 0 & wordMap[pos + 2] == 1 & wordMap[pos + 3] == 1 & wordMap[pos + 4] == 3) //сгсс+ь
 								{
-									fullword = fullword + sword[pos + 0] + sword[pos + 1] + "-"; //10 ни олиш
-									pos = pos + 2;
+									fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + sword[pos + 3] + sword[pos + 4] + "-"; //1011+3 ни олиш
+									pos = pos + 5;
+									unli++;
+									goto endundosh;
+								}
+								// 1013 холатни аниклаш (мульти, бальзам), юмшатиш белгили сузлар
+								if (wordMap[pos + 0] == 1 & wordMap[pos + 1] == 0 & wordMap[pos + 2] == 1 & wordMap[pos + 3] == 3) //сгсь
+								{
+									fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + sword[pos + 3] + "-"; //1013 ни олиш
+									pos = pos + 4;
 									unli++;
 									goto endundosh;
 								}
 
-								// 102+0 холатни аниклаш
-								if (posStr[pos + 0] == 1 & posStr[pos + 1] == 0 & posStr[pos + 2] == 2 & posStr[pos + 3] == 0) //сгъ
+								// Айриш белгиси катнашган сузларда бугин кучириш
+								// 1201 холатни аниклаш (съём-ка)
+								if (wordMap[pos + 0] == 1 & wordMap[pos + 1] == 2 & wordMap[pos + 2] == 0 & wordMap[pos + 3] == 1) //съгс
+								{
+									fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + sword[pos + 3] + "-"; //1201 ни олиш
+									pos = pos + 4;
+									unli++;
+									goto endundosh;
+								}
+								// 1012 холатни аниклаш
+								if (wordMap[pos + 0] == 1 & wordMap[pos + 1] == 0 & wordMap[pos + 2] == 1 & wordMap[pos + 3] == 2) //сгсъ
+								{
+									fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + sword[pos + 3] + "-"; //1012 ни олиш
+									pos = pos + 4;
+									unli++;
+									goto endundosh;
+								}
+								// 1021+1 холатни аниклаш
+								if (wordMap[pos + 0] == 1 & wordMap[pos + 1] == 0 & wordMap[pos + 2] == 2 & wordMap[pos + 3] == 1 & wordMap[pos + 4] == 1) //сгъс+с
+								{
+									fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + sword[pos + 3] + "-"; //1021 ни олиш
+									pos = pos + 4;
+									unli++;
+									goto endundosh;
+								}
+								// 1021+0 холатни аниклаш
+								if (wordMap[pos + 0] == 1 & wordMap[pos + 1] == 0 & wordMap[pos + 2] == 2 & wordMap[pos + 3] == 1 & wordMap[pos + 4] == 0) //сгъс+г
 								{
 									fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + "-"; //102 ни олиш
 									pos = pos + 3;
 									unli++;
 									goto endundosh;
 								}
-
-								// 10 холатни аниклаш
-								if (posStr[pos + 0] == 1 & posStr[pos + 1] == 0) //сг кейинги товушни текшириш шарт эмас
-								{
-									fullword = fullword + sword[pos + 0] + sword[pos + 1] + "-"; //10 ни олиш
-									pos = pos + 2;
-									unli++;
-									goto endundosh;
-								}
-
-							endundosh:;
 							}
 
-							// Охирги бугинни аниклаш ва олиш
-							if ((unliall - unli) == 1)
+							// 110 холатни аниклаш
+							if (wordMap[pos + 0] == 1 & wordMap[pos + 1] == 1 & wordMap[pos + 2] == 0) //ссг кейинги товушни текшириш шарт эмас
 							{
-							lastsyl:
-								for (int j = pos; j < wordlen; j++) fullword = fullword + sword[j];
-								fileout << fullword << endl;
-								goto wordfin;
+								fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + "-"; //110 ни олиш
+								pos = pos + 3;
+								unli++;
+								goto endundosh;
 							}
-						}  // Бугинларни санаш ва шакллантириш цикли (охири) -------------------------------------------------
+
+							// 101+1 холатни аниклаш
+							if (wordMap[pos + 0] == 1 & wordMap[pos + 1] == 0 & wordMap[pos + 2] == 1 & wordMap[pos + 3] == 1) //сгс+с
+							{
+								fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + "-"; //101 ни олиш
+								pos = pos + 3;
+								unli++;
+								goto endundosh;
+							}
+
+							// 101+0 холатни аниклаш
+							if (wordMap[pos + 0] == 1 & wordMap[pos + 1] == 0 & wordMap[pos + 2] == 1 & wordMap[pos + 3] == 0) //сгс+с
+							{
+								fullword = fullword + sword[pos + 0] + sword[pos + 1] + "-"; //10 ни олиш
+								pos = pos + 2;
+								unli++;
+								goto endundosh;
+							}
+
+							// 102+0 холатни аниклаш
+							if (wordMap[pos + 0] == 1 & wordMap[pos + 1] == 0 & wordMap[pos + 2] == 2 & wordMap[pos + 3] == 0) //сгъ
+							{
+								fullword = fullword + sword[pos + 0] + sword[pos + 1] + sword[pos + 2] + "-"; //102 ни олиш
+								pos = pos + 3;
+								unli++;
+								goto endundosh;
+							}
+
+							// 10 холатни аниклаш
+							if (wordMap[pos + 0] == 1 & wordMap[pos + 1] == 0) //сг кейинги товушни текшириш шарт эмас
+							{
+								fullword = fullword + sword[pos + 0] + sword[pos + 1] + "-"; //10 ни олиш
+								pos = pos + 2;
+								unli++;
+								goto endundosh;
+							}
+
+						endundosh:;
+						}
+
+								// Охирги бугинни аниклаш ва олиш
+								if ((unliall - unli) == 1)
+								{
+								lastsyl:
+									for (int j = pos; j < wordlen; j++) fullword = fullword + sword[j];
+									fileout << fullword << endl;
+									goto wordfin;
+								}
+							  // Бугинларни санаш ва шакллантириш цикли (охири) -------------------------------------------------
 					wordfin:;
 					} // Суз икки ва ундан куп бугиндан иборат булса шарти (охири) -------------------------------------------
 				}
@@ -607,6 +433,101 @@ namespace ConsoleApp1
 				else
 				{
 					result = "а-э-ро-";
+				}
+			}
+			return result;
+		}
+
+		public string IsAvia(string word)
+		{
+			word = word.ToLower();
+			string result = "";
+			if (word.Contains("авиа"))
+			{
+				int index = word.IndexOf("авиа");
+				if (index == 0)
+				{
+					result = "а-ви-а";
+				}
+				else
+				{
+					result = "а-ви-а-";
+				}
+			}
+			return result;
+		}
+
+		public string IsFoto(string word)
+		{
+			word = word.ToLower();
+			string result = "";
+			if (word.Contains("фото"))
+			{
+				int index = word.IndexOf("фото");
+				if (index == 0)
+				{
+					result = "фо-то";
+				}
+				else
+				{
+					result = "фо-то-";
+				}
+			}
+			return result;
+		}
+
+		public string IsFoton(string word)
+		{
+			word = word.ToLower();
+			string result = "";
+			if (word.Contains("фотон"))
+			{
+				int index = word.IndexOf("фотон");
+				if (index == 0)
+				{
+					result = "фо-тон";
+				}
+				else
+				{
+					result = "фо-тон-";
+				}
+			}
+			return result;
+		}
+
+		public string IsTele(string word)
+		{
+			word = word.ToLower();
+			string result = "";
+			if (word.Contains("теле"))
+			{
+				int index = word.IndexOf("теле");
+				if (index == 0)
+				{
+					result = "те-ле";
+				}
+				else
+				{
+					result = "те-ле-";
+				}
+			}
+			return result;
+		}
+
+		public string IsAvto(string word)
+		{
+			word = word.ToLower();
+			string result = "";
+			if (word.Contains("авто"))
+			{
+				int index = word.IndexOf("авто");
+				if (index == 0)
+				{
+					result = "ав-то";
+				}
+				else
+				{
+					result = "ав-то-";
 				}
 			}
 			return result;
@@ -808,11 +729,11 @@ namespace ConsoleApp1
 										*/
 
 										// "Фото" ва "Фотон" сузларини ажратиб олиш-----------------------------------------------------------------------------------------------
-										if ((wordlen - pos > 3 & unliall - unli > 1) & ((int)sword[pos] == 1060 || (int)sword[pos] == 1092))
+										if ((wordlen - pos > 3 & unliall - unli > 1) & ((int)sword[pos] == 'Ф' || (int)sword[pos] == 'ф'))
 										{
-											if (((int)sword[pos + 0] == 1060 & (int)sword[pos + 1] == 'О' & (int)sword[pos + 2] == 1058 & (int)sword[pos + 3] == 'О') ||
-													((int)sword[pos + 0] == 1060 & (int)sword[pos + 1] == 'о' & (int)sword[pos + 2] == 1090 & (int)sword[pos + 3] == 'о') ||
-													((int)sword[pos + 0] == 1092 & (int)sword[pos + 1] == 'о' & (int)sword[pos + 2] == 1090 & (int)sword[pos + 3] == 'о'))
+											if (((int)sword[pos + 0] == 'Ф' & (int)sword[pos + 1] == 'О' & (int)sword[pos + 2] == 'Т' & (int)sword[pos + 3] == 'О') ||
+													((int)sword[pos + 0] == 'Ф' & (int)sword[pos + 1] == 'о' & (int)sword[pos + 2] == 'т' & (int)sword[pos + 3] == 'о') ||
+													((int)sword[pos + 0] == 'ф' & (int)sword[pos + 1] == 'о' & (int)sword[pos + 2] == 'т' & (int)sword[pos + 3] == 'о'))
 											{
 												if (wordlen == 4)
 												{
@@ -859,9 +780,9 @@ namespace ConsoleApp1
 										}
 
 										// "Теле" сузини ажратиб олиш ---------------------------------------------------------------------------------------------
-										if ((wordlen - pos > 3 & unliall - unli > 1) & ((int)sword[pos] == 1058 || (int)sword[pos] == 1090))
+										if ((wordlen - pos > 3 & unliall - unli > 1) & ((int)sword[pos] == 'Т' || (int)sword[pos] == 'т'))
 										{
-											if (((int)sword[pos + 0] == 1058 || (int)sword[pos + 0] == 1090) & // Т ёки т
+											if (((int)sword[pos + 0] == 'Т' || (int)sword[pos + 0] == 'т') & // Т ёки т
 													((int)sword[pos + 1] == 1045 || (int)sword[pos + 1] == 1077) & // Е ёки е
 													((int)sword[pos + 2] == 1051 || (int)sword[pos + 2] == 1083) & // Л ёки л
 													((int)sword[pos + 3] == 1045 || (int)sword[pos + 3] == 1077)) // Е ёки е
@@ -894,7 +815,7 @@ namespace ConsoleApp1
 										{
 											if (((int)sword[pos + 0] == 'А' || (int)sword[pos + 0] == 'а') & // А ёки а
 													((int)sword[pos + 1] == 1042 || (int)sword[pos + 1] == 1074) & // В ёки в
-													((int)sword[pos + 2] == 1058 || (int)sword[pos + 2] == 1090) & // Т ёки т
+													((int)sword[pos + 2] == 'Т' || (int)sword[pos + 2] == 'т') & // Т ёки т
 													((int)sword[pos + 3] == 'О' || (int)sword[pos + 3] == 'о')) // О ёки о
 											{
 												if (wordlen == 4)
