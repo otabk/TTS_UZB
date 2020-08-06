@@ -19,7 +19,7 @@ namespace ConsoleApp1
 
 		static void Main(string[] args)
 		{
-			string input = Console.ReadLine();
+			/*string input = Console.ReadLine();
 			var c = input.ToString().ToCharArray();
 			var numbers = Array.ConvertAll(c, i => (int)char.GetNumericValue(i));
 			var nlemght = numbers.Length;
@@ -28,7 +28,8 @@ namespace ConsoleApp1
 			{
 				result.Add(Num2Text(numbers[i], j));
 			}
-			Console.WriteLine(string.Join(" ", result.ToArray()));
+			Console.WriteLine(string.Join(" ", result.ToArray()));*/
+
 			Console.ReadKey();
 		}
 
