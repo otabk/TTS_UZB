@@ -22,10 +22,10 @@ namespace ConsoleApp1
 		{
 			word = word.ToLower();
 			List<string> slogs = new List<string>();
-			int unlilar = 0;
+			int jamiunli = 0, unlilar = 0;
 			int wordLenght = word.Length;
 			wordMap = new int[wordLenght];
-			string tempword = "";
+			string tempword = word;
 			int position = 0;
 			for (int i = 0; i < word.Length; i++) //todo lotin alfavit uchun ham yozish kerak
 			{
@@ -41,7 +41,7 @@ namespace ConsoleApp1
 						word[i] == 'я') //я
 				{
 					wordMap[i] = 0;
-					unlilar++;
+					jamiunli++;
 				}
 				else
 				{
@@ -60,7 +60,7 @@ namespace ConsoleApp1
 			}
 
 			// агар суз бир бугиндан иборат булса
-			if (unlilar == 1)
+			if (jamiunli == 1)
 			{
 				slogs.Add(word);
 				return slogs;
@@ -68,10 +68,17 @@ namespace ConsoleApp1
 			// Суз икки ва ундан куп бугиндан иборат булса (боши) --------------------------------------------------------------------------------
 			else
 			{
-				for (int i = 0; i < unlilar; i++)
+				for (int i = 0; i < jamiunli; i++)
 				{
+					// охирги бзғинни олиш
+					if(unlilar == 1)
+					{
+						slogs.Add(tempword);
+						return slogs;
+					}
+
 					// охири "ё" билан тугаган сузлар билан ишлаш
-					if ((unlilar == 2) && (word[wordLenght - 1] == 'ё')) // 2 та унли ва охири "ё" булса
+					if ((jamiunli == 2) && (word[wordLenght - 1] == 'ё')) // 2 та унли ва охири "ё" булса
 					{
 						for (int j = position; j < wordLenght - 1; j++)
 						{
@@ -79,49 +86,54 @@ namespace ConsoleApp1
 						}
 						slogs.Add(tempword);
 						slogs.Add("ё");
+						unlilar -= 1;
 						return slogs;
 					}
 					/*
 					 * maxsus so'zlaga tekshirish
 					 */
 					// Агар суз унли харфдан бошланса------------------------------------------------------------------------------------
-					if (wordMap[0] == 1)
+					if (wordMap[0 + position] == 0)
 					{
-						if (wordLenght - position  > 4)
+						if (tempword.Length  > 4) // агар суз узунлиги 4 харфдан катта булса
 						{
 							// 0111+0 холатни аниклаш
-							if (wordMap[0] == 0 & wordMap[1] == 1 & wordMap[2] == 1 & wordMap[3] == 1 & wordMap[4] == 0) //гссс+г
+							if (wordMap[0 + position] == 0 & wordMap[1 + position] == 1 & wordMap[2 + position] == 1 & wordMap[3 + position] == 1 & wordMap[4 + position] == 0) //гссс+г
 							{
-								slogs.Add(word.Substring(0, 3)); //011 ни олиш (авжланмок, антракт)
-								word = word.Substring(2, wordLenght - position  - 3);
+								slogs.Add(tempword.Substring(0, 3)); //011 ни олиш (авжланмок, антракт)
+								tempword = tempword.Substring(2, wordLenght - position  - 3);
+								unlilar -= 1;
 								continue;
 							}
 						}
-						if (wordLenght - position  > 3) // агар суз узунлиги 3 харфдан катта булса
+						if (tempword.Length  > 3) // агар суз узунлиги 3 харфдан катта булса
 						{
 							// 011+1 холатни аниклаш
-							if (wordMap[0] == 0 & wordMap[1] == 1 & wordMap[2] == 1 & wordMap[3] == 1) //гсс+с
+							if (wordMap[0 + position] == 0 & wordMap[1 + position] == 1 & wordMap[2 + position] == 1 & wordMap[3 + position] == 1) //гсс+с
 							{
 								slogs.Add(word.Substring(0, 3)); //011 ни олиш
 								word = word.Substring(3);
+								unlilar -= 1;
 								continue;
 							}
 							// 011+0 холатни аниклаш
-							if (wordMap[0] == 0 & wordMap[1] == 1 & wordMap[2] == 1 & wordMap[3] == 0) //гсс+г
+							if (wordMap[0 + position] == 0 & wordMap[1 + position] == 1 & wordMap[2 + position] == 1 & wordMap[3 + position] == 0) //гсс+г
 							{
 								slogs.Add(word.Substring(0, 2)); //01 ни олиш
 								word = word.Substring(2);
+								unlilar -= 1;
 								continue;
 							}
 							// 02 холатни аниклаш
-							if (wordMap[0] == 0 & wordMap[1] == 2) //г+ъ
+							if (wordMap[0 + position] == 0 & wordMap[1 + position] == 2) //г+ъ
 							{
 								slogs.Add(word.Substring(0, 2)); //02 ни олиш
 								word = word.Substring(2);
+								unlilar -= 1;
 								continue;
 							}
 							// 012 холатни аниклаш
-							if (wordMap[0] == 0 & wordMap[1] == 1 & wordMap[2] == 2) //гс+ъ
+							if (wordMap[0 + position] == 0 & wordMap[1 + position] == 1 & wordMap[2 + position] == 2) //гс+ъ
 							{
 								slogs.Add(word.Substring(0, 3)); //012 ни олиш
 								word = word.Substring(3);
@@ -131,7 +143,7 @@ namespace ConsoleApp1
 						else // агар суз узунлиги 3 харф ва ундан кичик булса
 						{
 							// 013 холатни аниклаш (альфа, ультра) юмшатиш белгили сузлар
-							if (wordMap[0] == 0 & wordMap[1] == 1 & wordMap[2] == 3) // гсь
+							if (wordMap[0 + position] == 0 & wordMap[1 + position] == 1 & wordMap[2 + position] == 3) // гсь
 							{
 								slogs.Add(word.Substring(0, 3)); //013 ни олиш
 								word = word.Substring(3);
@@ -139,7 +151,7 @@ namespace ConsoleApp1
 							}
 
 							// 01+0 холатни аниклаш
-							if (wordMap[0] == 0 & wordMap[1] == 1 & wordMap[2] == 0) //сг+с
+							if (wordMap[0 + position] == 0 & wordMap[1 + position] == 1 & wordMap[2 + position] == 0) //сг+с
 							{
 								if ((word[1] == 1049 || word[1] == 1081) & (word[2] == 1025 || word[2] == 1105)) // агар унлидан кейин "йё" булса
 								{
@@ -168,146 +180,182 @@ namespace ConsoleApp1
 						if (wordLenght - position  > 5) // агар суз узунлиги 5 харфдан катта булса
 						{
 							// 11011+1 холатни аниклаш
-							if (wordMap[0] == 1 & wordMap[1] == 1 & wordMap[2] == 0 & wordMap[3] == 1 & wordMap[4] == 1 & wordMap[5] == 1) //ссгсс+с
+							if (wordMap[0 + position] == 1 & wordMap[1 + position] == 1 & wordMap[2 + position] == 0 & wordMap[3 + position] == 1 & wordMap[4 + position] == 1 & wordMap[5 + position] == 1) //ссгсс+с
 							{
 								tempword = tempword + word[0] + word[1] + word[2] + word[3] + word[4] + "-"; //11011 ни олиш
 								continue;
 							}
 							// 11011+0 холатни аниклаш
-							if (wordMap[0] == 1 & wordMap[1] == 1 & wordMap[2] == 0 & wordMap[3] == 1 & wordMap[4] == 1 & wordMap[5] == 0) //ссгсс+с
+							if (wordMap[0 + position] == 1 & wordMap[1 + position] == 1 & wordMap[2 + position] == 0 & wordMap[3 + position] == 1 & wordMap[4 + position] == 1 & wordMap[5 + position] == 0) //ссгсс+с
 							{
 								tempword = tempword + word[0] + word[1] + word[2] + word[3] + "-"; //1101 ни олиш
 								continue;
 							}
 							// 101311+1 холатни аниклаш (фильтрлаш, фильтрнинг), юмшатиш белгили сузлар
-							if (wordMap[0] == 1 & wordMap[1] == 0 & wordMap[2] == 1 & wordMap[3] == 3 & wordMap[4] == 1 & wordMap[5] == 1 & wordMap[6] == 1) //сгсьсс+с
+							if (wordMap[0 + position] == 1 & wordMap[1 + position] == 0 & wordMap[2 + position] == 1 & wordMap[3 + position] == 3 & wordMap[4 + position] == 1 & wordMap[5 + position] == 1 & wordMap[6 + position] == 1) //сгсьсс+с
 							{
 								tempword = tempword + word[0] + word[1] + word[2] + word[3] + word[4] + word[5] + "-"; //101311 ни олиш
 								continue;
 							}
 
 							// 10131+1 холатни аниклаш (мультфильм, фильмнинг), юмшатиш белгили сузлар
-							if (wordMap[0] == 1 & wordMap[1] == 0 & wordMap[2] == 1 & wordMap[3] == 3 & wordMap[4] == 1 & wordMap[5] == 1) //сгсьс+с
+							if (wordMap[position + 0] == 1 & wordMap[position + 1] == 0 & wordMap[position + 2] == 1 & wordMap[position + 3] == 3 & wordMap[position + 4] == 1 & wordMap[position + 5] == 1) //сгсьс+с
 							{
-								tempword = tempword + word[0] + word[1] + word[2] + word[3] + word[4] + "-"; //10131 ни олиш
-								continue;
+								tempword = tempword + tempword[position + 0] + tempword[position + 1] + tempword[position + 2] + tempword[position + 3] + tempword[position + 4] + "-"; //10131 ни олиш
+								position = position + 5;
+								unli++;
+								goto endundosh;
 							}
 
 							// 10111+0 холатни аниклаш
-							if (wordMap[0] == 1 & wordMap[1] == 0 & wordMap[2] == 1 & wordMap[3] == 1 & wordMap[4] == 1 & wordMap[5] == 0) //сгссс+г
+							if (wordMap[position + 0] == 1 & wordMap[position + 1] == 0 & wordMap[position + 2] == 1 & wordMap[position + 3] == 1 & wordMap[position + 4] == 1 & wordMap[position + 5] == 0) //сгссс+г
 							{
-								tempword = tempword + word[0] + word[1] + word[2] + "-"; //101 ни олиш (кон-тракт)
-								continue;
+								tempword = tempword + tempword[position + 0] + tempword[position + 1] + tempword[position + 2] + "-"; //101 ни олиш (кон-тракт)
+								position = position + 3;
+								unli++;
+								goto endundosh;
 							}
 						}
 
 						if (wordLenght - position > 4) // агар суз узунлиги 4 харфдан катта булса
 						{
 							// 1101+1 холатни аниклаш
-							if (wordMap[0] == 1 & wordMap[1] == 1 & wordMap[2] == 0 & wordMap[3] == 1 & wordMap[4] == 1) //ссгс+с
+							if (wordMap[position + 0] == 1 & wordMap[position + 1] == 1 & wordMap[position + 2] == 0 & wordMap[position + 3] == 1 & wordMap[position + 4] == 1) //ссгс+с
 							{
-								tempword = tempword + word[0] + word[1] + word[2] + word[3] + "-"; //1101 ни олиш
-								continue;
+								tempword = tempword + tempword[position + 0] + tempword[position + 1] + tempword[position + 2] + tempword[position + 3] + "-"; //1101 ни олиш
+								position = position + 4;
+								unli++;
+								goto endundosh;
 							}
 							// 1101+0 холатни аниклаш
-							if (wordMap[0] == 1 & wordMap[1] == 1 & wordMap[2] == 0 & wordMap[3] == 1 & wordMap[4] == 0) //ссгс+г
+							if (wordMap[position + 0] == 1 & wordMap[position + 1] == 1 & wordMap[position + 2] == 0 & wordMap[position + 3] == 1 & wordMap[position + 4] == 0) //ссгс+г
 							{
-								tempword = tempword + word[0] + word[1] + word[2] + "-"; //110 ни олиш
-								continue;
+								tempword = tempword + tempword[position + 0] + tempword[position + 1] + tempword[position + 2] + "-"; //110 ни олиш
+								position = position + 3;
+								unli++;
+								goto endundosh;
 							}
 							// 1101+3 холатни аниклаш (статья)
-							if (wordMap[0] == 1 & wordMap[1] == 1 & wordMap[2] == 0 & wordMap[3] == 1 & wordMap[4] == 3) //ссгс+ь
+							if (wordMap[position + 0] == 1 & wordMap[position + 1] == 1 & wordMap[position + 2] == 0 & wordMap[position + 3] == 1 & wordMap[position + 4] == 3) //ссгс+ь
 							{
-								tempword = tempword + word[0] + word[1] + word[2] + word[3] + word[4] + "-"; //11013 ни олиш
-								continue;
+								tempword = tempword + tempword[position + 0] + tempword[position + 1] + tempword[position + 2] + tempword[position + 3] + tempword[position + 4] + "-"; //11013 ни олиш
+								position = position + 5;
+								unli++;
+								goto endundosh;
 							}
 
 							// 1011+1 холатни аниклаш
-							if (wordMap[0] == 1 & wordMap[1] == 0 & wordMap[2] == 1 & wordMap[3] == 1 & wordMap[4] == 1) //сгсс+с
+							if (wordMap[position + 0] == 1 & wordMap[position + 1] == 0 & wordMap[position + 2] == 1 & wordMap[position + 3] == 1 & wordMap[position + 4] == 1) //сгсс+с
 							{
-								tempword = tempword + word[0] + word[1] + word[2] + word[3] + "-"; //1011 ни олиш
-								continue;
+								tempword = tempword + tempword[position + 0] + tempword[position + 1] + tempword[position + 2] + tempword[position + 3] + "-"; //1011 ни олиш
+								position = position + 4;
+								unli++;
+								goto endundosh;
 							}
 							// 1011+0 холатни аниклаш
-							if (wordMap[0] == 1 & wordMap[1] == 0 & wordMap[2] == 1 & wordMap[3] == 1 & wordMap[4] == 0) //сгсс+г
+							if (wordMap[position + 0] == 1 & wordMap[position + 1] == 0 & wordMap[position + 2] == 1 & wordMap[position + 3] == 1 & wordMap[position + 4] == 0) //сгсс+г
 							{
-								tempword = tempword + word[0] + word[1] + word[2] + "-"; //101 ни олиш
-								continue;
+								tempword = tempword + tempword[position + 0] + tempword[position + 1] + tempword[position + 2] + "-"; //101 ни олиш
+								position = position + 3;
+								unli++;
+								goto endundosh;
 							}
 
 							// 1011+3 холатни аниклаш (компьютер), юмшатиш белгили сузлар
-							if (wordMap[0] == 1 & wordMap[1] == 0 & wordMap[2] == 1 & wordMap[3] == 1 & wordMap[4] == 3) //сгсс+ь
+							if (wordMap[position + 0] == 1 & wordMap[position + 1] == 0 & wordMap[position + 2] == 1 & wordMap[position + 3] == 1 & wordMap[position + 4] == 3) //сгсс+ь
 							{
-								tempword = tempword + word[0] + word[1] + word[2] + word[3] + word[4] + "-"; //1011+3 ни олиш
-								continue;
+								tempword = tempword + tempword[position + 0] + tempword[position + 1] + tempword[position + 2] + tempword[position + 3] + tempword[position + 4] + "-"; //1011+3 ни олиш
+								position = position + 5;
+								unli++;
+								goto endundosh;
 							}
 							// 1013 холатни аниклаш (мульти, бальзам), юмшатиш белгили сузлар
-							if (wordMap[0] == 1 & wordMap[1] == 0 & wordMap[2] == 1 & wordMap[3] == 3) //сгсь
+							if (wordMap[position + 0] == 1 & wordMap[position + 1] == 0 & wordMap[position + 2] == 1 & wordMap[position + 3] == 3) //сгсь
 							{
-								tempword = tempword + word[0] + word[1] + word[2] + word[3] + "-"; //1013 ни олиш
-								continue;
+								tempword = tempword + tempword[position + 0] + tempword[position + 1] + tempword[position + 2] + tempword[position + 3] + "-"; //1013 ни олиш
+								position = position + 4;
+								unli++;
+								goto endundosh;
 							}
 
 							// Айриш белгиси катнашган сузларда бугин кучириш
 							// 1201 холатни аниклаш (съём-ка)
-							if (wordMap[0] == 1 & wordMap[1] == 2 & wordMap[2] == 0 & wordMap[3] == 1) //съгс
+							if (wordMap[position + 0] == 1 & wordMap[position + 1] == 2 & wordMap[position + 2] == 0 & wordMap[position + 3] == 1) //съгс
 							{
-								tempword = tempword + word[0] + word[1] + word[2] + word[3] + "-"; //1201 ни олиш
-								continue;
+								tempword = tempword + tempword[position + 0] + tempword[position + 1] + tempword[position + 2] + tempword[position + 3] + "-"; //1201 ни олиш
+								position = position + 4;
+								unli++;
+								goto endundosh;
 							}
 							// 1012 холатни аниклаш
-							if (wordMap[0] == 1 & wordMap[1] == 0 & wordMap[2] == 1 & wordMap[3] == 2) //сгсъ
+							if (wordMap[position + 0] == 1 & wordMap[position + 1] == 0 & wordMap[position + 2] == 1 & wordMap[position + 3] == 2) //сгсъ
 							{
-								tempword = tempword + word[0] + word[1] + word[2] + word[3] + "-"; //1012 ни олиш
-								continue;
+								tempword = tempword + tempword[position + 0] + tempword[position + 1] + tempword[position + 2] + tempword[position + 3] + "-"; //1012 ни олиш
+								position = position + 4;
+								unli++;
+								goto endundosh;
 							}
 							// 1021+1 холатни аниклаш
-							if (wordMap[0] == 1 & wordMap[1] == 0 & wordMap[2] == 2 & wordMap[3] == 1 & wordMap[4] == 1) //сгъс+с
+							if (wordMap[position + 0] == 1 & wordMap[position + 1] == 0 & wordMap[position + 2] == 2 & wordMap[position + 3] == 1 & wordMap[position + 4] == 1) //сгъс+с
 							{
-								tempword = tempword + word[0] + word[1] + word[2] + word[3] + "-"; //1021 ни олиш
-								continue;
+								tempword = tempword + tempword[position + 0] + tempword[position + 1] + tempword[position + 2] + tempword[position + 3] + "-"; //1021 ни олиш
+								position = position + 4;
+								unli++;
+								goto endundosh;
 							}
 							// 1021+0 холатни аниклаш
-							if (wordMap[0] == 1 & wordMap[1] == 0 & wordMap[2] == 2 & wordMap[3] == 1 & wordMap[4] == 0) //сгъс+г
+							if (wordMap[position + 0] == 1 & wordMap[position + 1] == 0 & wordMap[position + 2] == 2 & wordMap[position + 3] == 1 & wordMap[position + 4] == 0) //сгъс+г
 							{
-								tempword = tempword + word[0] + word[1] + word[2] + "-"; //102 ни олиш
-								continue;
+								tempword = tempword + tempword[position + 0] + tempword[position + 1] + tempword[position + 2] + "-"; //102 ни олиш
+								position = position + 3;
+								unli++;
+								goto endundosh;
 							}
 						}
 
 						// 110 холатни аниклаш
-						if (wordMap[0] == 1 & wordMap[1] == 1 & wordMap[2] == 0) //ссг кейинги товушни текшириш шарт эмас
+						if (wordMap[position + 0] == 1 & wordMap[position + 1] == 1 & wordMap[position + 2] == 0) //ссг кейинги товушни текшириш шарт эмас
 						{
-							tempword = tempword + word[0] + word[1] + word[2] + "-"; //110 ни олиш
-							continue;
+							tempword = tempword + tempword[position + 0] + tempword[position + 1] + tempword[position + 2] + "-"; //110 ни олиш
+							position = position + 3;
+							unli++;
+							goto endundosh;
 						}
 
 						// 101+1 холатни аниклаш
-						if (wordMap[0] == 1 & wordMap[1] == 0 & wordMap[2] == 1 & wordMap[3] == 1) //сгс+с
+						if (wordMap[position + 0] == 1 & wordMap[position + 1] == 0 & wordMap[position + 2] == 1 & wordMap[position + 3] == 1) //сгс+с
 						{
-							tempword = tempword + word[0] + word[1] + word[2] + "-"; //101 ни олиш
-							continue;
+							tempword = tempword + tempword[position + 0] + tempword[position + 1] + tempword[position + 2] + "-"; //101 ни олиш
+							position = position + 3;
+							unli++;
+							goto endundosh;
 						}
 
 						// 101+0 холатни аниклаш
-						if (wordMap[0] == 1 & wordMap[1] == 0 & wordMap[2] == 1 & wordMap[3] == 0) //сгс+с
+						if (wordMap[position + 0] == 1 & wordMap[position + 1] == 0 & wordMap[position + 2] == 1 & wordMap[position + 3] == 0) //сгс+с
 						{
-							tempword = tempword + word[0] + word[1] + "-"; //10 ни олиш
-							continue;
+							tempword = tempword + tempword[position + 0] + tempword[position + 1] + "-"; //10 ни олиш
+							position = position + 2;
+							unli++;
+							goto endundosh;
 						}
 
 						// 102+0 холатни аниклаш
-						if (wordMap[0] == 1 & wordMap[1] == 0 & wordMap[2] == 2 & wordMap[3] == 0) //сгъ
+						if (wordMap[position + 0] == 1 & wordMap[position + 1] == 0 & wordMap[position + 2] == 2 & wordMap[position + 3] == 0) //сгъ
 						{
-							tempword = tempword + word[0] + word[1] + word[2] + "-"; //102 ни олиш
-							continue;
+							tempword = tempword + tempword[position + 0] + tempword[position + 1] + tempword[position + 2] + "-"; //102 ни олиш
+							position = position + 3;
+							unli++;
+							goto endundosh;
 						}
 
 						// 10 холатни аниклаш
-						if (wordMap[0] == 1 & wordMap[1] == 0) //сг кейинги товушни текшириш шарт эмас
+						if (wordMap[position + 0] == 1 & wordMap[position + 1] == 0) //сг кейинги товушни текшириш шарт эмас
 						{
-							tempword = tempword + word[0] + word[1] + "-"; //10 ни олиш
-							continue;
+							tempword = tempword + tempword[position + 0] + tempword[position + 1] + "-"; //10 ни олиш
+							position = position + 2;
+							unli++;
+							goto endundosh;
 						}
 					}
 				}
