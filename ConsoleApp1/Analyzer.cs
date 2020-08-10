@@ -11,7 +11,6 @@ namespace ConsoleApp1
 	class Analyzer
 	{
 		string _word;
-		private int[] wordMap;
 
 		public Analyzer(string w)
 		{
@@ -24,7 +23,8 @@ namespace ConsoleApp1
 			List<string> slogs = new List<string>();
 			int jamiunli = 0, unlilar = 0;
 			int wordLenght = word.Length;
-			wordMap = new int[wordLenght];
+			//int[] wordMap = new int[wordLenght];
+			string wordMap = "";
 			string tempword = word;
 			int position = 0;
 			for (int i = 0; i < word.Length; i++) //todo lotin alfavit uchun ham yozish kerak
@@ -40,21 +40,22 @@ namespace ConsoleApp1
 						word[i] == 'ю' || //ю
 						word[i] == 'я') //я
 				{
-					wordMap[i] = 0;
+					//wordMap[i] = 0;
+					wordMap += 0;
 					jamiunli++;
 				}
 				else
 				{
 					if (word[i] == 'ъ') //Ъ ва ъ белгиларини аниклаш
 					{
-						wordMap[i] = 2;
+						//wordMap[i] = 2;
 					}
 					else
 					{
 						if (word[i] == 'ь') //Ь ва ь белгиларини аниклаш
-							wordMap[i] = 3;
+							//wordMap[i] = 3;
 						else
-							wordMap[i] = 1;
+							//wordMap[i] = 1;
 					}
 				}
 			}
@@ -101,7 +102,7 @@ namespace ConsoleApp1
 							if (wordMap[0 + position] == 0 & wordMap[1 + position] == 1 & wordMap[2 + position] == 1 & wordMap[3 + position] == 1 & wordMap[4 + position] == 0) //гссс+г
 							{
 								slogs.Add(tempword.Substring(0, 3)); //011 ни олиш (авжланмок, антракт)
-								tempword = tempword.Substring(2, wordLenght - position  - 3);
+								tempword = tempword.Remove(0, 3);// Substring(2, wordLenght - position  - 3);
 								unlilar -= 1;
 								continue;
 							}
@@ -112,7 +113,7 @@ namespace ConsoleApp1
 							if (wordMap[0 + position] == 0 & wordMap[1 + position] == 1 & wordMap[2 + position] == 1 & wordMap[3 + position] == 1) //гсс+с
 							{
 								slogs.Add(word.Substring(0, 3)); //011 ни олиш
-								word = word.Substring(3);
+								tempword = tempword.Remove(0, 3);
 								unlilar -= 1;
 								continue;
 							}
