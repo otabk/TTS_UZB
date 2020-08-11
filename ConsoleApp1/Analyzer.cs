@@ -21,10 +21,11 @@ namespace ConsoleApp1
 		{
 			word = word.ToLower();
 			List<string> slogs = new List<string>();
-			int jamiunli = 0, unlilar = 0;
+			int jamiunli = 0;
 			int wordLenght = word.Length;
 			//int[] wordMap = new int[wordLenght];
 			string wordMap = "";
+			StringBuilder wordMapBuilder = new StringBuilder();
 			string tempword = word;
 			int position = 0;
 			for (int i = 0; i < word.Length; i++) //todo lotin alfavit uchun ham yozish kerak
@@ -40,25 +41,34 @@ namespace ConsoleApp1
 						word[i] == 'ю' || //ю
 						word[i] == 'я') //я
 				{
-					//wordMap[i] = 0;
-					wordMap += 0;
+					//wordMap[i] = '0';
+					wordMapBuilder.Append("0");
 					jamiunli++;
 				}
 				else
 				{
 					if (word[i] == 'ъ') //Ъ ва ъ белгиларини аниклаш
 					{
-						//wordMap[i] = 2;
+						//wordMap[i] = '2';
+						wordMapBuilder.Append("2");
 					}
 					else
 					{
 						if (word[i] == 'ь') //Ь ва ь белгиларини аниклаш
-							//wordMap[i] = 3;
+						{
+							//wordMap[i] = '3';
+							wordMapBuilder.Append("3");
+						}
 						else
-							//wordMap[i] = 1;
+						{
+							//wordMap[i] = '1';
+							wordMapBuilder.Append("1");
+						}
 					}
 				}
 			}
+
+			wordMap = wordMapBuilder.ToString();
 
 			// агар суз бир бугиндан иборат булса
 			if (jamiunli == 1)
@@ -69,10 +79,10 @@ namespace ConsoleApp1
 			// Суз икки ва ундан куп бугиндан иборат булса (боши) --------------------------------------------------------------------------------
 			else
 			{
-				for (int i = 0; i < jamiunli; i++)
+				for (int i = 0; i < ; i++)
 				{
 					// охирги бзғинни олиш
-					if(unlilar == 1)
+					if(jamiunli == 1)
 					{
 						slogs.Add(tempword);
 						return slogs;
@@ -87,91 +97,94 @@ namespace ConsoleApp1
 						}
 						slogs.Add(tempword);
 						slogs.Add("ё");
-						unlilar -= 1;
 						return slogs;
 					}
-					/*
-					 * maxsus so'zlaga tekshirish
-					 */
+					/* maxsus so'zlaga tekshirish */
+					/**/
 					// Агар суз унли харфдан бошланса------------------------------------------------------------------------------------
-					if (wordMap[0 + position] == 0)
+					if (wordMap[0] == '0')
 					{
 						if (tempword.Length  > 4) // агар суз узунлиги 4 харфдан катта булса
 						{
 							// 0111+0 холатни аниклаш
-							if (wordMap[0 + position] == 0 & wordMap[1 + position] == 1 & wordMap[2 + position] == 1 & wordMap[3 + position] == 1 & wordMap[4 + position] == 0) //гссс+г
+							if (wordMap[0] == '0' && wordMap[1] == '1' && wordMap[2] == '1' && wordMap[3] == '1' && wordMap[4] == '0') //гссс+г
 							{
 								slogs.Add(tempword.Substring(0, 3)); //011 ни олиш (авжланмок, антракт)
 								tempword = tempword.Remove(0, 3);// Substring(2, wordLenght - position  - 3);
-								unlilar -= 1;
+								wordMap.Remove(0, 3);
 								continue;
 							}
 						}
 						if (tempword.Length  > 3) // агар суз узунлиги 3 харфдан катта булса
 						{
 							// 011+1 холатни аниклаш
-							if (wordMap[0 + position] == 0 & wordMap[1 + position] == 1 & wordMap[2 + position] == 1 & wordMap[3 + position] == 1) //гсс+с
+							if (wordMap[0] == '0' && wordMap[1] == '1' && wordMap[2] == '1' && wordMap[3] == '1') //гсс+с
 							{
-								slogs.Add(word.Substring(0, 3)); //011 ни олиш
+								slogs.Add(tempword.Substring(0, 3)); //011 ни олиш
 								tempword = tempword.Remove(0, 3);
-								unlilar -= 1;
+								wordMap.Remove(0, 3);
 								continue;
 							}
 							// 011+0 холатни аниклаш
-							if (wordMap[0 + position] == 0 & wordMap[1 + position] == 1 & wordMap[2 + position] == 1 & wordMap[3 + position] == 0) //гсс+г
+							if (wordMap[0] == '0' && wordMap[1] == '1' && wordMap[2] == '1' && wordMap[3] == '0') //гсс+г
 							{
-								slogs.Add(word.Substring(0, 2)); //01 ни олиш
-								word = word.Substring(2);
-								unlilar -= 1;
+								slogs.Add(tempword.Substring(0, 2)); //01 ни олиш
+								tempword = tempword.Remove(0, 2);
+								wordMap.Remove(0, 2);
 								continue;
 							}
 							// 02 холатни аниклаш
-							if (wordMap[0 + position] == 0 & wordMap[1 + position] == 2) //г+ъ
+							if (wordMap[0] == '0' && wordMap[1] == '2') //г+ъ
 							{
-								slogs.Add(word.Substring(0, 2)); //02 ни олиш
-								word = word.Substring(2);
-								unlilar -= 1;
+								slogs.Add(tempword.Substring(0, 2)); //02 ни олиш
+								tempword = tempword.Remove(0, 2);
+								wordMap.Remove(0, 2);
 								continue;
 							}
 							// 012 холатни аниклаш
-							if (wordMap[0 + position] == 0 & wordMap[1 + position] == 1 & wordMap[2 + position] == 2) //гс+ъ
+							if (wordMap[0] == '0' && wordMap[1] == '1' && wordMap[2] == '2') //гс+ъ
 							{
-								slogs.Add(word.Substring(0, 3)); //012 ни олиш
-								word = word.Substring(3);
+								slogs.Add(tempword.Substring(0, 3)); //012 ни олиш
+								tempword = tempword.Remove(0, 3);
+								wordMap.Remove(0, 3);
 								continue;
 							}
 						}
 						else // агар суз узунлиги 3 харф ва ундан кичик булса
 						{
 							// 013 холатни аниклаш (альфа, ультра) юмшатиш белгили сузлар
-							if (wordMap[0 + position] == 0 & wordMap[1 + position] == 1 & wordMap[2 + position] == 3) // гсь
+							if (wordMap[0] == '0' && wordMap[1] == '1' && wordMap[2] == '3') // гсь
 							{
-								slogs.Add(word.Substring(0, 3)); //013 ни олиш
-								word = word.Substring(3);
+								slogs.Add(tempword.Substring(0, 3)); //013 ни олиш
+								tempword = tempword.Remove(0, 3);
+								wordMap.Remove(0, 3);
 								continue;
 							}
 
 							// 01+0 холатни аниклаш
-							if (wordMap[0 + position] == 0 & wordMap[1 + position] == 1 & wordMap[2 + position] == 0) //сг+с
+							if (wordMap[0] == '0' && wordMap[1] == '1' && wordMap[2] == '0') //сг+с
 							{
-								if ((word[1] == 1049 || word[1] == 1081) & (word[2] == 1025 || word[2] == 1105)) // агар унлидан кейин "йё" булса
+								if ((word[1] == 1049 || word[1] == 1081) && (word[2] == 1025 || word[2] == 1105)) // агар унлидан кейин "йё" булса
 								{
-									slogs.Add(word.Substring(0, 2)); //01 ни олиш (унли+й ни олиш) - ай-ёр, ай-ём
-									word = word.Substring(2);
+									slogs.Add(tempword.Substring(0, 2)); //01 ни олиш (унли+й ни олиш) - ай-ёр, ай-ём
+									tempword = tempword.Remove(0, 2);
+									wordMap.Remove(0, 2);
 									continue;
 								}
 								else
 								{
-									slogs.Add(word.Substring(0, 1)); //0 ни олиш (акс холда факат унлини олиш)
-									word = word.Substring(1);
+									slogs.Add(tempword.Substring(0, 1)); //0 ни олиш (акс холда факат унлини олиш)
+									tempword = tempword.Remove(0, 1);
+									wordMap.Remove(0, 1);
 									continue;
 								}
 							}
 							// 0+0 холатни аниклаш
-							if (wordMap[0] == 0 & wordMap[1] == 0) //г+г
+							if (wordMap[0] == '0' && wordMap[1] == '0') //г+г
 							{
-								slogs.Add(word.Substring(0, 1)); ; //0 ни олиш
-								word = word.Substring(1);
+								slogs.Add(tempword.Substring(0, 1)); //0 ни олиш
+								tempword = tempword.Remove(0, 1);
+								wordMap.Remove(0, 1);
 								continue;
 							}
 						}
@@ -181,182 +194,188 @@ namespace ConsoleApp1
 						if (wordLenght - position  > 5) // агар суз узунлиги 5 харфдан катта булса
 						{
 							// 11011+1 холатни аниклаш
-							if (wordMap[0 + position] == 1 & wordMap[1 + position] == 1 & wordMap[2 + position] == 0 & wordMap[3 + position] == 1 & wordMap[4 + position] == 1 & wordMap[5 + position] == 1) //ссгсс+с
+							if (wordMap[0] == '1' && wordMap[1] == '1' && wordMap[2] == '0' && wordMap[3] == '1' && wordMap[4] == '1' && wordMap[5] == '1') //ссгсс+с
 							{
-								tempword = tempword + word[0] + word[1] + word[2] + word[3] + word[4] + "-"; //11011 ни олиш
+								slogs.Add(tempword.Substring(0, 5)); //11011 ни олиш
+								tempword = tempword.Remove(0, 5);
+								wordMap.Remove(0, 5);
 								continue;
 							}
 							// 11011+0 холатни аниклаш
-							if (wordMap[0 + position] == 1 & wordMap[1 + position] == 1 & wordMap[2 + position] == 0 & wordMap[3 + position] == 1 & wordMap[4 + position] == 1 & wordMap[5 + position] == 0) //ссгсс+с
+							if (wordMap[0] == '1' && wordMap[1] == '1' && wordMap[2] == '0' && wordMap[3] == '1' && wordMap[4] == '1' && wordMap[5] == '0') //ссгсс+с
 							{
-								tempword = tempword + word[0] + word[1] + word[2] + word[3] + "-"; //1101 ни олиш
+								slogs.Add(tempword.Substring(0, 4));  //1101 ни олиш
+								tempword = tempword.Remove(0, 4);
+								wordMap.Remove(0, 4);
 								continue;
 							}
 							// 101311+1 холатни аниклаш (фильтрлаш, фильтрнинг), юмшатиш белгили сузлар
-							if (wordMap[0 + position] == 1 & wordMap[1 + position] == 0 & wordMap[2 + position] == 1 & wordMap[3 + position] == 3 & wordMap[4 + position] == 1 & wordMap[5 + position] == 1 & wordMap[6 + position] == 1) //сгсьсс+с
+							if (wordMap[0] == '1' && wordMap[1] == '0' && wordMap[2] == '1' && wordMap[3] == '3' && wordMap[4] == '1' && wordMap[5] == '1' && wordMap[6] == '1') //сгсьсс+с
 							{
-								tempword = tempword + word[0] + word[1] + word[2] + word[3] + word[4] + word[5] + "-"; //101311 ни олиш
+								slogs.Add(tempword.Substring(0, 6)); //101311 ни олиш
+								tempword = tempword.Remove(0, 6);
+								wordMap.Remove(0, 6);
 								continue;
 							}
 
 							// 10131+1 холатни аниклаш (мультфильм, фильмнинг), юмшатиш белгили сузлар
-							if (wordMap[position + 0] == 1 & wordMap[position + 1] == 0 & wordMap[position + 2] == 1 & wordMap[position + 3] == 3 & wordMap[position + 4] == 1 & wordMap[position + 5] == 1) //сгсьс+с
+							if (wordMap[0] == '1' && wordMap[1] == '0' && wordMap[2] == '1' && wordMap[3] == '3' && wordMap[4] == '1' && wordMap[5] == '1') //сгсьс+с
 							{
-								tempword = tempword + tempword[position + 0] + tempword[position + 1] + tempword[position + 2] + tempword[position + 3] + tempword[position + 4] + "-"; //10131 ни олиш
-								position = position + 5;
-								unli++;
-								goto endundosh;
+								slogs.Add(tempword.Substring(0, 5)); //10131 ни олиш
+								tempword = tempword.Remove(0,5);
+								wordMap.Remove(0, 5);
+								continue;
 							}
 
 							// 10111+0 холатни аниклаш
-							if (wordMap[position + 0] == 1 & wordMap[position + 1] == 0 & wordMap[position + 2] == 1 & wordMap[position + 3] == 1 & wordMap[position + 4] == 1 & wordMap[position + 5] == 0) //сгссс+г
+							if (wordMap[0] == '1' && wordMap[1] == '0' && wordMap[2] == '1' && wordMap[3] == '1' && wordMap[4] == '1' && wordMap[5] == '0') //сгссс+г
 							{
-								tempword = tempword + tempword[position + 0] + tempword[position + 1] + tempword[position + 2] + "-"; //101 ни олиш (кон-тракт)
-								position = position + 3;
-								unli++;
-								goto endundosh;
+								slogs.Add(tempword.Substring(0, 3)); //101 ни олиш (кон-тракт)
+								tempword = tempword.Remove(0, 3);
+								wordMap.Remove(0, 3);
+								continue;
 							}
 						}
 
 						if (wordLenght - position > 4) // агар суз узунлиги 4 харфдан катта булса
 						{
 							// 1101+1 холатни аниклаш
-							if (wordMap[position + 0] == 1 & wordMap[position + 1] == 1 & wordMap[position + 2] == 0 & wordMap[position + 3] == 1 & wordMap[position + 4] == 1) //ссгс+с
+							if (wordMap[0] == '1' && wordMap[1] == '1' && wordMap[2] == '0' && wordMap[3] == '1' && wordMap[4] == '1') //ссгс+с
 							{
-								tempword = tempword + tempword[position + 0] + tempword[position + 1] + tempword[position + 2] + tempword[position + 3] + "-"; //1101 ни олиш
-								position = position + 4;
-								unli++;
-								goto endundosh;
+								slogs.Add(tempword.Substring(0, 4)); //1101 ни олиш
+								tempword = tempword.Remove(0, 4);
+								wordMap.Remove(0, 4);
+								continue;
 							}
 							// 1101+0 холатни аниклаш
-							if (wordMap[position + 0] == 1 & wordMap[position + 1] == 1 & wordMap[position + 2] == 0 & wordMap[position + 3] == 1 & wordMap[position + 4] == 0) //ссгс+г
+							if (wordMap[0] == '1' && wordMap[1] == '1' && wordMap[2] == '0' && wordMap[3] == '1' && wordMap[4] == '0') //ссгс+г
 							{
-								tempword = tempword + tempword[position + 0] + tempword[position + 1] + tempword[position + 2] + "-"; //110 ни олиш
-								position = position + 3;
-								unli++;
-								goto endundosh;
+								slogs.Add(tempword.Substring(0, 3)); //110 ни олиш
+								tempword = tempword.Remove(0, 3);
+								wordMap.Remove(0, 3);
+								continue;
 							}
 							// 1101+3 холатни аниклаш (статья)
-							if (wordMap[position + 0] == 1 & wordMap[position + 1] == 1 & wordMap[position + 2] == 0 & wordMap[position + 3] == 1 & wordMap[position + 4] == 3) //ссгс+ь
+							if (wordMap[0] == '1' && wordMap[1] == '1' && wordMap[2] == '0' && wordMap[3] == '1' && wordMap[4] == '3') //ссгс+ь
 							{
-								tempword = tempword + tempword[position + 0] + tempword[position + 1] + tempword[position + 2] + tempword[position + 3] + tempword[position + 4] + "-"; //11013 ни олиш
-								position = position + 5;
-								unli++;
-								goto endundosh;
+								slogs.Add(tempword.Substring(0, 5)); //11013 ни олиш
+								tempword = tempword.Remove(0, 5);
+								wordMap.Remove(0, 5);
+								continue;
 							}
 
 							// 1011+1 холатни аниклаш
-							if (wordMap[position + 0] == 1 & wordMap[position + 1] == 0 & wordMap[position + 2] == 1 & wordMap[position + 3] == 1 & wordMap[position + 4] == 1) //сгсс+с
+							if (wordMap[0] == '1' && wordMap[1] == '0' && wordMap[2] == '1' && wordMap[3] == '1' && wordMap[4] == '1') //сгсс+с
 							{
-								tempword = tempword + tempword[position + 0] + tempword[position + 1] + tempword[position + 2] + tempword[position + 3] + "-"; //1011 ни олиш
-								position = position + 4;
-								unli++;
-								goto endundosh;
+								slogs.Add(tempword.Substring(0, 4)); //1011 ни олиш
+								tempword = tempword.Remove(0, 4);
+								wordMap.Remove(0, 4);
+								continue;
 							}
 							// 1011+0 холатни аниклаш
-							if (wordMap[position + 0] == 1 & wordMap[position + 1] == 0 & wordMap[position + 2] == 1 & wordMap[position + 3] == 1 & wordMap[position + 4] == 0) //сгсс+г
+							if (wordMap[0] == '1' && wordMap[1] == '0' && wordMap[2] == '1' && wordMap[3] == '1' && wordMap[4] == '0') //сгсс+г
 							{
-								tempword = tempword + tempword[position + 0] + tempword[position + 1] + tempword[position + 2] + "-"; //101 ни олиш
-								position = position + 3;
-								unli++;
-								goto endundosh;
+								slogs.Add(tempword.Substring(0, 3)); //101 ни олиш
+								tempword = tempword.Remove(0, 3);
+								wordMap.Remove(0, 3);
+								continue;
 							}
 
 							// 1011+3 холатни аниклаш (компьютер), юмшатиш белгили сузлар
-							if (wordMap[position + 0] == 1 & wordMap[position + 1] == 0 & wordMap[position + 2] == 1 & wordMap[position + 3] == 1 & wordMap[position + 4] == 3) //сгсс+ь
+							if (wordMap[0] == '1' && wordMap[1] == '0' && wordMap[2] == '1' && wordMap[3] == '1' && wordMap[4] == '3') //сгсс+ь
 							{
-								tempword = tempword + tempword[position + 0] + tempword[position + 1] + tempword[position + 2] + tempword[position + 3] + tempword[position + 4] + "-"; //1011+3 ни олиш
-								position = position + 5;
-								unli++;
-								goto endundosh;
+								slogs.Add(tempword.Substring(0, 5)); //1011+3 ни олиш
+								tempword = tempword.Remove(0, 5);
+								wordMap.Remove(0, 5);
+								continue;
 							}
 							// 1013 холатни аниклаш (мульти, бальзам), юмшатиш белгили сузлар
-							if (wordMap[position + 0] == 1 & wordMap[position + 1] == 0 & wordMap[position + 2] == 1 & wordMap[position + 3] == 3) //сгсь
+							if (wordMap[0] == '1' && wordMap[1] == '0' && wordMap[2] == '1' && wordMap[3] == '3') //сгсь
 							{
-								tempword = tempword + tempword[position + 0] + tempword[position + 1] + tempword[position + 2] + tempword[position + 3] + "-"; //1013 ни олиш
-								position = position + 4;
-								unli++;
-								goto endundosh;
+								slogs.Add(tempword.Substring(0, 4)); //1013 ни олиш
+								tempword = tempword.Remove(0, 4);
+								wordMap.Remove(0, 4);
+								continue;
 							}
 
 							// Айриш белгиси катнашган сузларда бугин кучириш
 							// 1201 холатни аниклаш (съём-ка)
-							if (wordMap[position + 0] == 1 & wordMap[position + 1] == 2 & wordMap[position + 2] == 0 & wordMap[position + 3] == 1) //съгс
+							if (wordMap[0] == '1' && wordMap[1] == '2' && wordMap[2] == '0' && wordMap[3] == '1') //съгс
 							{
-								tempword = tempword + tempword[position + 0] + tempword[position + 1] + tempword[position + 2] + tempword[position + 3] + "-"; //1201 ни олиш
-								position = position + 4;
-								unli++;
-								goto endundosh;
+								slogs.Add(tempword.Substring(0, 4)); //1201 ни олиш
+								tempword = tempword.Remove(0, 4);
+								wordMap.Remove(0, 4);
+								continue;
 							}
 							// 1012 холатни аниклаш
-							if (wordMap[position + 0] == 1 & wordMap[position + 1] == 0 & wordMap[position + 2] == 1 & wordMap[position + 3] == 2) //сгсъ
+							if (wordMap[0] == '1' && wordMap[1] == '0' && wordMap[2] == '1' && wordMap[3] == '2') //сгсъ
 							{
-								tempword = tempword + tempword[position + 0] + tempword[position + 1] + tempword[position + 2] + tempword[position + 3] + "-"; //1012 ни олиш
-								position = position + 4;
-								unli++;
-								goto endundosh;
+								slogs.Add(tempword.Substring(0, 4)); //1012 ни олиш
+								tempword = tempword.Remove(0, 4);
+								wordMap.Remove(0, 4);
+								continue;
 							}
 							// 1021+1 холатни аниклаш
-							if (wordMap[position + 0] == 1 & wordMap[position + 1] == 0 & wordMap[position + 2] == 2 & wordMap[position + 3] == 1 & wordMap[position + 4] == 1) //сгъс+с
+							if (wordMap[0] == '1' && wordMap[1] == '0' && wordMap[2] == '2' && wordMap[3] == '1' && wordMap[4] == '1') //сгъс+с
 							{
-								tempword = tempword + tempword[position + 0] + tempword[position + 1] + tempword[position + 2] + tempword[position + 3] + "-"; //1021 ни олиш
-								position = position + 4;
-								unli++;
-								goto endundosh;
+								slogs.Add(tempword.Substring(0, 4)); //1021 ни олиш
+								tempword = tempword.Remove(0,4);
+								wordMap.Remove(0, 4);
+								continue;
 							}
 							// 1021+0 холатни аниклаш
-							if (wordMap[position + 0] == 1 & wordMap[position + 1] == 0 & wordMap[position + 2] == 2 & wordMap[position + 3] == 1 & wordMap[position + 4] == 0) //сгъс+г
+							if (wordMap[0] == '1' && wordMap[1] == '0' && wordMap[2] == '2' && wordMap[3] == '1' && wordMap[4] == '0') //сгъс+г
 							{
-								tempword = tempword + tempword[position + 0] + tempword[position + 1] + tempword[position + 2] + "-"; //102 ни олиш
-								position = position + 3;
-								unli++;
-								goto endundosh;
+								slogs.Add(tempword.Substring(0, 3)); //102 ни олиш
+								tempword = tempword.Remove(0,3);
+								wordMap.Remove(0, 3);
+								continue;
 							}
 						}
 
 						// 110 холатни аниклаш
-						if (wordMap[position + 0] == 1 & wordMap[position + 1] == 1 & wordMap[position + 2] == 0) //ссг кейинги товушни текшириш шарт эмас
+						if (wordMap[0] == '1' && wordMap[1] == '1' && wordMap[2] == '0') //ссг кейинги товушни текшириш шарт эмас
 						{
-							tempword = tempword + tempword[position + 0] + tempword[position + 1] + tempword[position + 2] + "-"; //110 ни олиш
-							position = position + 3;
-							unli++;
-							goto endundosh;
+							slogs.Add(tempword.Substring(0, 3)); //110 ни олиш
+							tempword = tempword.Remove(0, 3);
+							wordMap.Remove(0, 3);
+							continue;
 						}
 
 						// 101+1 холатни аниклаш
-						if (wordMap[position + 0] == 1 & wordMap[position + 1] == 0 & wordMap[position + 2] == 1 & wordMap[position + 3] == 1) //сгс+с
+						if (wordMap[0] == '1' && wordMap[1] == '0' && wordMap[2] == '1' && wordMap[3] == '1') //сгс+с
 						{
-							tempword = tempword + tempword[position + 0] + tempword[position + 1] + tempword[position + 2] + "-"; //101 ни олиш
-							position = position + 3;
-							unli++;
-							goto endundosh;
+							slogs.Add(tempword.Substring(0, 3)); //101 ни олиш
+							tempword = tempword.Remove(0, 3);
+							wordMap.Remove(0, 3);
+							continue;
 						}
 
 						// 101+0 холатни аниклаш
-						if (wordMap[position + 0] == 1 & wordMap[position + 1] == 0 & wordMap[position + 2] == 1 & wordMap[position + 3] == 0) //сгс+с
+						if (wordMap[0] == '1' && wordMap[1] == '0' && wordMap[2] == '1' && wordMap[3] == '0') //сгс+с
 						{
-							tempword = tempword + tempword[position + 0] + tempword[position + 1] + "-"; //10 ни олиш
-							position = position + 2;
-							unli++;
-							goto endundosh;
+							slogs.Add(tempword.Substring(0, 2)); //10 ни олиш
+							tempword = tempword.Remove(0, 2);
+							wordMap.Remove(0, 2);
+							continue;
 						}
 
 						// 102+0 холатни аниклаш
-						if (wordMap[position + 0] == 1 & wordMap[position + 1] == 0 & wordMap[position + 2] == 2 & wordMap[position + 3] == 0) //сгъ
+						if (wordMap[0] == '1' && wordMap[1] == '0' && wordMap[2] == '2' && wordMap[3] == '0') //сгъ
 						{
-							tempword = tempword + tempword[position + 0] + tempword[position + 1] + tempword[position + 2] + "-"; //102 ни олиш
-							position = position + 3;
-							unli++;
-							goto endundosh;
+							slogs.Add(tempword.Substring(0, 3)); //102 ни олиш
+							tempword = tempword.Remove(0, 3);
+							wordMap.Remove(0, 3);
+							continue;
 						}
 
 						// 10 холатни аниклаш
-						if (wordMap[position + 0] == 1 & wordMap[position + 1] == 0) //сг кейинги товушни текшириш шарт эмас
+						if (wordMap[0] == '1' && wordMap[1] == '0') //сг кейинги товушни текшириш шарт эмас
 						{
-							tempword = tempword + tempword[position + 0] + tempword[position + 1] + "-"; //10 ни олиш
-							position = position + 2;
-							unli++;
-							goto endundosh;
+							slogs.Add(tempword.Substring(0, 2)); //10 ни олиш
+							tempword = tempword.Remove(0, 2);
+							wordMap.Remove(0, 2);
+							continue;
 						}
 					}
 				}
@@ -372,7 +391,7 @@ namespace ConsoleApp1
 			if (word.Contains("аэро"))
 			{
 				int index = word.IndexOf("аэро");
-				if (index == 0)
+				if (index == '0')
 				{
 					result = "а-э-ро";
 				}
@@ -391,7 +410,7 @@ namespace ConsoleApp1
 			if (word.Contains("авиа"))
 			{
 				int index = word.IndexOf("авиа");
-				if (index == 0)
+				if (index == '0')
 				{
 					result = "а-ви-а";
 				}
@@ -410,7 +429,7 @@ namespace ConsoleApp1
 			if (word.Contains("фото"))
 			{
 				int index = word.IndexOf("фото");
-				if (index == 0)
+				if (index == '0')
 				{
 					result = "фо-то";
 				}
@@ -429,7 +448,7 @@ namespace ConsoleApp1
 			if (word.Contains("фотон"))
 			{
 				int index = word.IndexOf("фотон");
-				if (index == 0)
+				if (index == '0')
 				{
 					result = "фо-тон";
 				}
@@ -448,7 +467,7 @@ namespace ConsoleApp1
 			if (word.Contains("теле"))
 			{
 				int index = word.IndexOf("теле");
-				if (index == 0)
+				if (index == '0')
 				{
 					result = "те-ле";
 				}
@@ -467,7 +486,7 @@ namespace ConsoleApp1
 			if (word.Contains("авто"))
 			{
 				int index = word.IndexOf("авто");
-				if (index == 0)
+				if (index == '0')
 				{
 					result = "ав-то";
 				}
