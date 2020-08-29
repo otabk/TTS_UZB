@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace ConsoleApp1
 {
@@ -29,6 +31,28 @@ namespace ConsoleApp1
 				result.Add(Num2Text(numbers[i], j));
 			}
 			Console.WriteLine(string.Join(" ", result.ToArray()));*/
+
+			Dictionary<string, string[]> dict = new Dictionary<string, string[]>();
+			Console.WriteLine(JsonConvert.SerializeObject(dict));
+			List<string> list = new List<string>();
+			using (var sr = File.OpenText("paths.txt"))
+			{
+				string[] paths = sr.ReadToEnd().Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+				for (int i = 0; i < paths.Length; i++)
+				{
+					var s = paths[i].Split('_');
+					var templist = new List<string>();
+					var lastslog = s[0];
+					if (i == 0)
+					{
+						dict.Add(s[0],)
+					}
+				}
+			}
+			using (var sw = File.CreateText("AudioPath.txt"))
+			{
+				
+			}
 
 			Console.ReadKey();
 		}
