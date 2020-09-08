@@ -9,6 +9,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 
 namespace ConsoleApp1
 {
@@ -33,14 +35,15 @@ namespace ConsoleApp1
 				result.Add(Num2Text(numbers[i], j));
 			}
 			Console.WriteLine(string.Join(" ", result.ToArray()));*/
-			string str = "ён";
+
+			/*string str = "ён"; kirildan lotinga
 			string[] lat_low = { "a", "b", "v", "g", "d", "e", "yo", "j", "z", "i", "y", "k", "l", "m", "n", "o", "p", "r", "s", "t", "u", "f", "x", "ts", "ch", "sh", "\'", "e", "yu", "ya" };
 			string[] rus_low = { "а", "б", "в", "г", "д", "е", "ё", "ж", "з", "и", "й", "к", "л", "м", "н", "о", "п", "р", "с", "т", "у", "ф", "х", "ц", "ч", "ш", "ъ", "э", "ю", "я" };
 			for (int i = 0; i < 30; i++)
 			{
 				str = str.Replace(rus_low[i], lat_low[i]);
 			}
-			Console.WriteLine(str);
+			Console.WriteLine(str);*/
 
 			/* ovoz bilan ishlash
 			SoundPlayer player = new SoundPlayer();
@@ -91,6 +94,52 @@ namespace ConsoleApp1
 				sw.Write(result);
 			}
 			*/
+
+
+			var first = new AudioFileReader(@"Data\ax_2.wav");
+			var second = new AudioFileReader(@"Data\bo_2.wav");
+			var third = new AudioFileReader(@"Data\rot_1.wav");
+			var fours = new AudioFileReader(@"Data\ax_2.wav");
+			var fives = new AudioFileReader(@"Data\bo_2.wav");
+			var six = new AudioFileReader(@"Data\rot_1.wav");
+
+			var takeDuration1 = new TimeSpan(0, 0, 0, 0, (int)(first.TotalTime.Milliseconds * 0.8)); // otherwise it would emit indefinitely
+			var takeDuration2 = new TimeSpan(0, 0, 0, 0, (int)(second.TotalTime.Milliseconds * 0.8));
+			var takeDuration3 = new TimeSpan(0, 0, 0, 0, (int)(third.TotalTime.Milliseconds * 0.8));
+
+			ISampleProvider[] sources = new[]
+			{
+				first.Take(takeDuration1),
+				second.Take(takeDuration2),
+				third.Take(takeDuration3)
+			};
+
+			var playlist = new ConcatenatingSampleProvider(sources);
+			//var waveProvider = mixingSampleProvider.ToWaveProvider();
+			using (var wo = new WaveOutEvent())
+			{
+				wo.Init(playlist);
+				wo.Play();
+				while (wo.PlaybackState == PlaybackState.Playing) Thread.Sleep(1000);
+			}
+
+			var sources2 = new[]
+			{
+				fours.Take(takeDuration1),
+				fives.Take(takeDuration2),
+				six.Take(takeDuration3)
+			};
+
+			var playlist2 = new ConcatenatingSampleProvider(sources2);
+
+			using (var wo2 = new WaveOutEvent())
+			{
+				wo2.Init(playlist2);
+				wo2.Play();
+				while (wo2.PlaybackState == PlaybackState.Playing) Thread.Sleep(100);
+			}
+
+			Console.WriteLine("Ta-da!!!!");
 			Console.ReadKey();
 		}
 
