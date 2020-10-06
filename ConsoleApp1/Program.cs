@@ -1,16 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Media;
-using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-using NAudio.Wave;
-using NAudio.Wave.SampleProviders;
+using System.Text.RegularExpressions;
 
 namespace ConsoleApp1
 {
@@ -95,118 +87,157 @@ namespace ConsoleApp1
 			}
 			*/
 
+			//wav faylni o'qish
+			//var first = new AudioFileReader(@"Data\ax_2.wav");
+			//var second = new AudioFileReader(@"Data\bo_2.wav");
+			//var third = new AudioFileReader(@"Data\rot_1.wav");
+			//var fours = new AudioFileReader(@"Data\ax_2.wav");
+			//var fives = new AudioFileReader(@"Data\bo_2.wav");
+			//var six = new AudioFileReader(@"Data\rot_1.wav");
 
-			var first = new AudioFileReader(@"Data\ax_2.wav");
-			var second = new AudioFileReader(@"Data\bo_2.wav");
-			var third = new AudioFileReader(@"Data\rot_1.wav");
-			var fours = new AudioFileReader(@"Data\ax_2.wav");
-			var fives = new AudioFileReader(@"Data\bo_2.wav");
-			var six = new AudioFileReader(@"Data\rot_1.wav");
+			//var takeDuration1 = new TimeSpan(0, 0, 0, 0, (int)(first.TotalTime.Milliseconds * 0.8)); // otherwise it would emit indefinitely
+			//var takeDuration2 = new TimeSpan(0, 0, 0, 0, (int)(second.TotalTime.Milliseconds * 0.8));
+			//var takeDuration3 = new TimeSpan(0, 0, 0, 0, (int)(third.TotalTime.Milliseconds * 0.8));
 
-			var takeDuration1 = new TimeSpan(0, 0, 0, 0, (int)(first.TotalTime.Milliseconds * 0.8)); // otherwise it would emit indefinitely
-			var takeDuration2 = new TimeSpan(0, 0, 0, 0, (int)(second.TotalTime.Milliseconds * 0.8));
-			var takeDuration3 = new TimeSpan(0, 0, 0, 0, (int)(third.TotalTime.Milliseconds * 0.8));
+			//ISampleProvider[] sources = new[]
+			//{
+			//	first.Take(takeDuration1),
+			//	second.Take(takeDuration2),
+			//	third.Take(takeDuration3)
+			//};
 
-			ISampleProvider[] sources = new[]
+			//var sources2 = new[]
+			//{
+			//	fours.Take(takeDuration1),
+			//	fives.Take(takeDuration2),
+			//	six.Take(takeDuration3)
+			//};
+
+			//var playlist2 = new ConcatenatingSampleProvider(sources2);
+
+			//var playlist = new ConcatenatingSampleProvider(sources);
+			////var waveProvider = mixingSampleProvider.ToWaveProvider();
+			//using (var wo = new WaveOutEvent())
+			//{
+			//	wo.Init(playlist);
+			//	wo.Play();
+			//	while (wo.PlaybackState == PlaybackState.Playing) Thread.Sleep(1000);
+			//	wo.Init(playlist2);
+			//	wo.Play();
+			//	while (wo.PlaybackState == PlaybackState.Playing) Thread.Sleep(1000);
+			//}
+
+			//using (var wo2 = new WaveOutEvent())
+			//{
+			//	wo2.Init(playlist2);
+			//	wo2.Play();
+			//	while (wo2.PlaybackState == PlaybackState.Playing) Thread.Sleep(100);
+			//}
+
+			Regex pattern = new Regex(@"[0-9]+[,.][0-9]+");
+			var str = "123 12.36 313262,12 123  -  123";
+			var matches = pattern.Matches(str);
+			Console.WriteLine($"Matches count: {matches.Count}");
+			for (int i = 0; i < matches.Count; i++)
 			{
-				first.Take(takeDuration1),
-				second.Take(takeDuration2),
-				third.Take(takeDuration3)
-			};
-
-			var playlist = new ConcatenatingSampleProvider(sources);
-			//var waveProvider = mixingSampleProvider.ToWaveProvider();
-			using (var wo = new WaveOutEvent())
-			{
-				wo.Init(playlist);
-				wo.Play();
-				while (wo.PlaybackState == PlaybackState.Playing) Thread.Sleep(1000);
+				var tmparr = matches[i].Value.Split(new[] { ".", "," }, StringSplitOptions.RemoveEmptyEntries);
+				Console.WriteLine($"{matches[i].Value} {Num2Text(tmparr[0])} бутун {Kasr(tmparr[1].Length)} {Num2Text(tmparr[1])}");
 			}
 
-			var sources2 = new[]
-			{
-				fours.Take(takeDuration1),
-				fives.Take(takeDuration2),
-				six.Take(takeDuration3)
-			};
-
-			var playlist2 = new ConcatenatingSampleProvider(sources2);
-
-			using (var wo2 = new WaveOutEvent())
-			{
-				wo2.Init(playlist2);
-				wo2.Play();
-				while (wo2.PlaybackState == PlaybackState.Playing) Thread.Sleep(100);
-			}
+			//var str = "fooBarfooSomethingfoo";
+			//var r = AllIndexesOf(str, "foo");
+			//foreach (int i in r )
+			//{
+			//	Console.WriteLine(i);
+			//}
 
 			Console.WriteLine("Ta-da!!!!");
 			Console.ReadKey();
 		}
 
-		private static string Num2Text(int i, int index)
+		public static IEnumerable<int> AllIndexesOf(string str, string value)
+		{
+			if (string.IsNullOrEmpty(value))
+				throw new ArgumentException("the string to find may not be empty", "value");
+			for (int index = 0; ; index += value.Length)
+			{
+				index = str.IndexOf(value, index);
+				if (index == -1)
+					break;
+				yield return index;
+			}
+		}
+
+		private static string Num2Text(string number) 
 		{
 			var sb = new List<string>();
-			switch (index)
+			var charArray = number.ToCharArray();
+			var numbers = Array.ConvertAll(charArray, i => (int)char.GetNumericValue(i));
+			var nlemght = numbers.Length;
+			for (int i = 0, j = nlemght; i < nlemght; i++, j--)
 			{
-				case 1:
-					sb.Add(DigitToText(i));
-					break;
-				case 2:
-					sb.Add(Digit10ToText(i));
-					break;
-				case 3:
-				if (i == 0)
-					break;
-					sb.Add(DigitToText(i));
-					sb.Add(_1000lik[0]);
-					break;
-				case 4:
-					sb.Add(DigitToText(i));
-					sb.Add(_1000lik[1]);
-					break;
-				case 5:
-					sb.Add(Digit10ToText(i));
-					break;
-				case 6:
-					sb.Add(DigitToText(i));
-					sb.Add(_1000lik[0]);
-					break;
-				case 7:
-					sb.Add(DigitToText(i));
-					sb.Add(_1000lik[2]);
-					break;
-				case 8:
-					sb.Add(Digit10ToText(i));
-					break;
-				case 9:
-					sb.Add(DigitToText(i));
-					sb.Add(_1000lik[0]);
-					break;
-				case 10:
-					sb.Add(DigitToText(i));
-					sb.Add(_1000lik[3]);
-					break;
-				case 11:
-					sb.Add(Digit10ToText(i));
-					break;
-				case 12:
-					sb.Add(DigitToText(i));
-					sb.Add(_1000lik[0]);
-					break;
-				case 13:
-					sb.Add(DigitToText(i));
-					sb.Add(_1000lik[4]);
-					break;
-				case 14:
-					sb.Add(Digit10ToText(i));
-					break;
-				case 15:
-					sb.Add(DigitToText(i));
-					sb.Add(_1000lik[0]);
-					break;
+				switch (j)
+				{
+					case 1:
+						sb.Add(DigitToText(numbers[i]));
+						break;
+					case 2:
+						sb.Add(Digit10ToText(numbers[i]));
+						break;
+					case 3:
+						if (numbers[i] == 0)
+							break;
+						sb.Add(DigitToText(numbers[i]));
+						sb.Add(_1000lik[0]);
+						break;
+					case 4:
+						sb.Add(DigitToText(numbers[i]));
+						sb.Add(_1000lik[1]);
+						break;
+					case 5:
+						sb.Add(Digit10ToText(numbers[i]));
+						break;
+					case 6:
+						sb.Add(DigitToText(numbers[i]));
+						sb.Add(_1000lik[0]);
+						break;
+					case 7:
+						sb.Add(DigitToText(numbers[i]));
+						sb.Add(_1000lik[2]);
+						break;
+					case 8:
+						sb.Add(Digit10ToText(numbers[i]));
+						break;
+					case 9:
+						sb.Add(DigitToText(numbers[i]));
+						sb.Add(_1000lik[0]);
+						break;
+					case 10:
+						sb.Add(DigitToText(numbers[i]));
+						sb.Add(_1000lik[3]);
+						break;
+					case 11:
+						sb.Add(Digit10ToText(numbers[i]));
+						break;
+					case 12:
+						sb.Add(DigitToText(numbers[i]));
+						sb.Add(_1000lik[0]);
+						break;
+					case 13:
+						sb.Add(DigitToText(numbers[i]));
+						sb.Add(_1000lik[4]);
+						break;
+					case 14:
+						sb.Add(Digit10ToText(numbers[i]));
+						break;
+					case 15:
+						sb.Add(DigitToText(numbers[i]));
+						sb.Add(_1000lik[0]);
+						break;
 					//todo kasr sonlarni qoshish
-				default:
-					break;
+					default:
+						break;
+				}
 			}
 			return string.Join(" ", sb.ToArray());
 		}
@@ -285,6 +316,44 @@ namespace ConsoleApp1
 					break;
 			}
 			return r;
+		}
+
+		private static string Kasr(int lenght)
+		{
+			var result = "";
+			switch (lenght)
+			{
+				case 1:
+					result = "ўндан";
+					break;
+				case 2:
+					result = "юздан";
+					break;
+				case 3:
+					result = "мингдан";
+					break;
+				case 4:
+					result = "ўн мингдан";
+					break;
+				case 5:
+					result = "юз мингдан";
+					break;
+				case 6:
+					result = "миллиондан";
+					break;
+				case 7:
+					result = "ўн миллиондан";
+					break;
+				case 8:
+					result = "юз миллиондан";
+					break;
+				case 9:
+					result = "миллиарддан";
+					break;
+				default:
+					break;
+			}
+			return result;
 		}
 
 		public static string CreateMD5(string input)
